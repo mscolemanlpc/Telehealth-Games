@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coping Cat Therapist</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#1a1a2e; --mint:#00d4aa; --gold:#f5a623; --lavender:#a78bfa;
+  --peach:#ff8c69; --accent:#e94560; --txt:rgba(240,240,248,1);
+  --txt-s:rgba(240,240,248,0.55); --card:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{min-height:100%;}
+body{font-family:'DM Sans',sans-serif;background:linear-gradient(160deg,#1a1a2e 0%,#0f2044 55%,#1a1a2e 100%);color:var(--txt);min-height:100vh;}
+
+/* starfield */
+body::before{content:'';position:fixed;inset:0;background-image:
+  radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,.4) 0%,transparent 100%),
+  radial-gradient(1px 1px at 32% 58%,rgba(255,255,255,.3) 0%,transparent 100%),
+  radial-gradient(1px 1px at 70% 12%,rgba(255,255,255,.35) 0%,transparent 100%),
+  radial-gradient(1px 1px at 85% 44%,rgba(255,255,255,.25) 0%,transparent 100%),
+  radial-gradient(2px 2px at 22% 82%,rgba(167,139,250,.5) 0%,transparent 100%),
+  radial-gradient(2px 2px at 63% 27%,rgba(0,212,170,.4) 0%,transparent 100%);
+  pointer-events:none;z-index:0;}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;padding:9px 18px;background:rgba(0,0,0,.38);border-bottom:1px solid var(--border);gap:12px;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
+.logo{font-family:'Fredoka One',cursive;font-size:1.15rem;color:var(--gold);display:flex;align-items:center;gap:7px;}
+.cat-bob{animation:bob 3s ease-in-out infinite;display:inline-block;}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.topbar-mid{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;}
+.pill{border-radius:50px;padding:4px 13px;font-size:.77rem;font-weight:700;display:inline-flex;align-items:center;gap:5px;}
+.pill-gold{background:rgba(245,166,35,.13);border:1.5px solid rgba(245,166,35,.32);color:var(--gold);}
+.pill-mint{background:rgba(0,212,170,.13);border:1.5px solid rgba(0,212,170,.32);color:var(--mint);}
+.pill-red{background:rgba(233,69,96,.12);border:1.5px solid rgba(233,69,96,.3);color:#ff8fa3;}
+.pill-gray{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.14);color:var(--txt-s);}
+.pill-waiting{background:rgba(245,166,35,.1);border:1.5px solid rgba(245,166,35,.28);color:var(--gold);}
+.pulse{width:7px;height:7px;border-radius:50%;background:currentColor;animation:pulse 2s ease-in-out infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(1.35)}}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:'Fredoka One',cursive;font-size:.97rem;padding:11px 22px;border-radius:50px;border:none;cursor:pointer;transition:transform .15s,box-shadow .15s;letter-spacing:.01em;}
+.btn:hover{transform:translateY(-2px);}
+.btn:active{transform:translateY(0);}
+.btn-gold{background:linear-gradient(135deg,#f5a623,#ff8c69);color:#0d0d1a;box-shadow:0 4px 14px rgba(245,166,35,.3);}
+.btn-mint{background:linear-gradient(135deg,#00d4aa,#00b8d4);color:#0a1628;box-shadow:0 4px 14px rgba(0,212,170,.3);}
+.btn-ghost{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.13);color:var(--txt-s);}
+.btn-ghost:hover{background:rgba(255,255,255,.12);}
+.btn-full{width:100%;}
+.btn-sm{font-size:.8rem;padding:7px 15px;}
+.btn-lav{background:linear-gradient(135deg,#a78bfa,#818cf8);color:white;box-shadow:0 4px 14px rgba(167,139,250,.28);}
+
+/* ── SCREENS ── */
+.screen{display:none;position:relative;z-index:1;}
+.screen.active{display:block;}
+.wrap{max-width:560px;margin:0 auto;padding:22px 16px 50px;}
+
+/* ════════════════════════════════
+   ROLE SELECTION
+════════════════════════════════ */
+.role-screen{min-height:calc(100vh - 50px);display:flex;align-items:center;justify-content:center;padding:20px;}
+.role-card{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:28px;padding:36px 28px;text-align:center;max-width:480px;width:100%;}
+.role-cat{font-size:4.5rem;display:block;animation:bob 2.5s ease-in-out infinite;margin-bottom:12px;}
+.role-title{font-family:'Fredoka One',cursive;font-size:2rem;background:linear-gradient(135deg,var(--gold),var(--peach));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+.role-sub{color:var(--txt-s);font-size:.88rem;margin-bottom:28px;line-height:1.6;}
+.role-btns{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.role-btn{border-radius:20px;padding:22px 16px;cursor:pointer;border:2px solid;transition:transform .2s,box-shadow .2s;text-align:center;background:transparent;}
+.role-btn:hover{transform:translateY(-4px) scale(1.02);}
+.role-btn .rb-icon{font-size:2.8rem;display:block;margin-bottom:8px;}
+.role-btn .rb-title{font-family:'Fredoka One',cursive;font-size:1.1rem;margin-bottom:4px;}
+.role-btn .rb-desc{font-size:.74rem;opacity:.65;}
+.role-btn.child{background:rgba(245,166,35,.08);border-color:rgba(245,166,35,.4);color:var(--txt);}
+.role-btn.child:hover{box-shadow:0 8px 28px rgba(245,166,35,.2);}
+.role-btn.therapist{background:rgba(0,212,170,.08);border-color:rgba(0,212,170,.4);color:var(--txt);}
+.role-btn.therapist:hover{box-shadow:0 8px 28px rgba(0,212,170,.2);}
+
+/* ════════════════════════════════
+   CHILD — SETUP
+════════════════════════════════ */
+.setup-center{min-height:calc(100vh - 50px);display:flex;align-items:center;justify-content:center;padding:20px;}
+.setup-card{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:24px;padding:32px 26px;text-align:center;max-width:440px;width:100%;}
+.big-cat{font-size:4.5rem;display:block;animation:bob 2.5s ease-in-out infinite;margin-bottom:12px;}
+.big-title{font-family:'Fredoka One',cursive;font-size:2rem;background:linear-gradient(135deg,var(--gold),var(--peach));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+.big-sub{color:var(--txt-s);font-size:.88rem;margin-bottom:22px;}
+.setup-inp{width:100%;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);border-radius:50px;padding:12px 20px;font-family:'Nunito',sans-serif;font-weight:700;font-size:1rem;color:var(--txt);text-align:center;margin-bottom:12px;transition:border-color .2s;}
+.setup-inp:focus{outline:none;border-color:var(--gold);}
+.setup-inp::placeholder{color:rgba(255,255,255,.28);}
+.av-row{display:flex;justify-content:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+.av-opt{font-size:2rem;width:52px;height:52px;border-radius:50%;border:2px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.av-opt:hover{transform:scale(1.1);border-color:var(--gold);}
+.av-opt.sel{border-color:var(--gold);background:rgba(245,166,35,.18);box-shadow:0 0 0 4px rgba(245,166,35,.18);transform:scale(1.1);}
+
+/* Waiting for therapist */
+.wait-center{min-height:calc(100vh - 50px);display:flex;align-items:center;justify-content:center;padding:20px;}
+.wait-card{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:24px;padding:32px 26px;text-align:center;max-width:400px;width:100%;}
+.code-box{background:rgba(245,166,35,.08);border:2px solid rgba(245,166,35,.35);border-radius:18px;padding:18px;margin:18px 0;}
+.code-lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--txt-s);font-weight:700;margin-bottom:6px;}
+.code-num{font-family:'Fredoka One',cursive;font-size:3.2rem;color:var(--gold);letter-spacing:.18em;}
+.code-hint{font-size:.78rem;color:var(--txt-s);margin-top:6px;}
+.wait-icon{font-size:3.5rem;display:block;animation:spin 3s linear infinite;margin-bottom:12px;}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+
+/* ════════════════════════════════
+   CHILD — GAME
+════════════════════════════════ */
+.home-top{text-align:center;margin-bottom:20px;}
+.home-av{font-size:3rem;display:block;animation:bob 2.5s ease-in-out infinite;margin-bottom:4px;}
+.home-hi{font-family:'Fredoka One',cursive;font-size:1.65rem;color:var(--gold);margin-bottom:2px;}
+.home-tag{color:var(--txt-s);font-size:.85rem;}
+.badges-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:16px;}
+.badge-chip{background:rgba(245,166,35,.1);border:1.5px solid rgba(245,166,35,.28);border-radius:50px;padding:3px 11px;font-size:.73rem;font-weight:700;color:var(--gold);}
+.mods-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;}
+@media(max-width:420px){.mods-grid{grid-template-columns:1fr;}}
+.mod-card{border-radius:17px;padding:17px 13px;cursor:pointer;transition:transform .2s;border:2px solid;position:relative;overflow:hidden;text-align:center;}
+.mod-card:hover:not(.locked){transform:translateY(-4px) scale(1.02);}
+.mod-card.locked{opacity:.35;cursor:not-allowed;}
+.mod-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.07) 0%,transparent 60%);pointer-events:none;}
+.mod-emoji{font-size:2.5rem;display:block;margin-bottom:6px;}
+.mod-name{font-family:'Fredoka One',cursive;font-size:.97rem;margin-bottom:2px;}
+.mod-desc{font-size:.72rem;opacity:.62;}
+.lock-ico{position:absolute;top:8px;right:8px;font-size:.78rem;opacity:.5;}
+.done-chk{position:absolute;top:8px;right:8px;width:19px;height:19px;border-radius:50%;background:var(--mint);color:#0a1628;font-size:.62rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.watching-bar{background:rgba(0,212,170,.09);border:1.5px solid rgba(0,212,170,.28);border-radius:11px;padding:7px 13px;font-size:.76rem;font-weight:700;color:var(--mint);display:flex;align-items:center;gap:7px;margin-bottom:14px;}
+
+/* Lesson */
+.nav-row{display:flex;gap:8px;margin-bottom:14px;align-items:center;}
+.step-dots{display:flex;justify-content:center;gap:6px;margin-bottom:14px;}
+.sdot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.14);transition:all .3s;}
+.sdot.active{background:var(--gold);transform:scale(1.4);}
+.sdot.done{background:var(--mint);}
+.cat-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;}
+.cat-ico{font-size:3.2rem;flex-shrink:0;animation:bob 2.5s ease-in-out infinite;}
+.bubble{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:15px;border-bottom-left-radius:3px;padding:12px 15px;font-size:.89rem;font-weight:600;line-height:1.6;flex:1;position:relative;}
+.bubble::before{content:'';position:absolute;left:-9px;top:12px;border:5px solid transparent;border-right-color:rgba(255,255,255,.15);}
+.l-card{background:rgba(255,255,255,.055);border:1.5px solid rgba(255,255,255,.1);border-radius:17px;padding:18px;margin-bottom:13px;}
+.sec-title{font-family:'Fredoka One',cursive;font-size:1.02rem;color:var(--gold);margin-bottom:9px;}
+.l-text{font-size:.87rem;line-height:1.75;color:rgba(240,240,248,.84);margin-bottom:9px;}
+.hl{background:linear-gradient(135deg,rgba(245,166,35,.1),rgba(255,140,105,.1));border:1.5px solid rgba(245,166,35,.26);border-radius:11px;padding:10px 13px;font-size:.83rem;font-weight:700;color:var(--peach);margin:9px 0;}
+.scenario{background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(233,69,96,.08));border:1.5px solid rgba(167,139,250,.26);border-radius:12px;padding:11px 14px;font-size:.84rem;font-weight:600;line-height:1.6;margin:9px 0;}
+
+/* Feelings */
+.feel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:9px 0;}
+.feel-btn{background:rgba(255,255,255,.055);border:2px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 5px;cursor:pointer;text-align:center;font-family:'Nunito',sans-serif;font-weight:700;font-size:.78rem;color:var(--txt);transition:all .2s;}
+.feel-btn:hover{border-color:var(--gold);background:rgba(245,166,35,.1);transform:scale(1.05);}
+.feel-btn.sel{border-color:var(--gold);background:rgba(245,166,35,.16);box-shadow:0 0 0 3px rgba(245,166,35,.16);}
+.feel-e{font-size:1.6rem;display:block;margin-bottom:2px;}
+
+/* Thermometer */
+.therm-row{display:flex;align-items:flex-end;gap:5px;justify-content:center;margin:11px 0;}
+.t-bar{border-radius:6px 6px 0 0;cursor:pointer;display:flex;flex-direction:column;align-items:center;padding-top:6px;font-weight:800;font-size:.72rem;text-shadow:0 1px 3px rgba(0,0,0,.5);border:2px solid transparent;transition:all .2s;width:42px;color:white;}
+.t-bar:hover{opacity:.82;transform:scaleY(1.05);transform-origin:bottom;}
+.t-bar.sel{border-color:white;box-shadow:0 0 0 3px rgba(255,255,255,.22);}
+
+/* Body scan */
+.body-scan{display:flex;gap:12px;align-items:center;}
+.body-ico{font-size:3.8rem;flex-shrink:0;}
+.body-list{flex:1;}
+.body-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:10px;margin-bottom:4px;cursor:pointer;font-weight:600;font-size:.8rem;border:1.5px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);transition:all .2s;}
+.body-item:hover{border-color:var(--accent);background:rgba(233,69,96,.09);}
+.body-item.sel{border-color:var(--accent);background:rgba(233,69,96,.13);}
+
+/* FEAR */
+.fear-steps{display:grid;gap:6px;margin:9px 0;}
+.fear-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.07);}
+.fear-letter{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:.95rem;color:white;flex-shrink:0;margin-top:2px;}
+.fear-t{font-weight:800;font-size:.84rem;margin-bottom:1px;}
+.fear-d{font-size:.73rem;color:var(--txt-s);}
+
+/* Tools */
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:9px 0;}
+.tool-btn{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.09);border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:.74rem;color:var(--txt);transition:all .2s;}
+.tool-btn:hover{border-color:var(--mint);background:rgba(0,212,170,.09);transform:scale(1.04);}
+.tool-btn.picked{border-color:var(--mint);background:rgba(0,212,170,.14);box-shadow:0 0 0 3px rgba(0,212,170,.12);}
+.tool-e{font-size:1.5rem;display:block;margin-bottom:2px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:9px 0;}
+.col-c{border-radius:12px;padding:10px;font-size:.78rem;line-height:1.65;}
+.col-bad{background:rgba(233,69,96,.09);border:1.5px solid rgba(233,69,96,.2);}
+.col-good{background:rgba(0,212,170,.09);border:1.5px solid rgba(0,212,170,.2);}
+.col-hd{font-weight:800;font-size:.74rem;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;}
+.col-bad .col-hd{color:var(--accent);}
+.col-good .col-hd{color:var(--mint);}
+.col-c li{color:rgba(240,240,248,.76);list-style:none;margin-bottom:1px;}
+
+/* Inputs */
+.g-inp{width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.11);border-radius:10px;padding:8px 12px;font-family:'Nunito',sans-serif;font-weight:600;font-size:.83rem;color:var(--txt);margin-bottom:6px;transition:border-color .2s;}
+.g-inp:focus{outline:none;border-color:var(--lavender);}
+.g-inp::placeholder{color:rgba(255,255,255,.2);}
+.g-ta{width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.11);border-radius:10px;padding:8px 12px;font-family:'Nunito',sans-serif;font-weight:600;font-size:.83rem;color:var(--txt);resize:none;min-height:66px;transition:border-color .2s;margin-bottom:6px;}
+.g-ta:focus{outline:none;border-color:var(--lavender);}
+.g-ta::placeholder{color:rgba(255,255,255,.2);}
+
+/* Quiz */
+.qpb{background:rgba(255,255,255,.09);border-radius:50px;height:7px;overflow:hidden;margin-bottom:16px;}
+.qpf{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--lavender),var(--mint));transition:width .5s;}
+.quiz-q{font-family:'Fredoka One',cursive;font-size:1.1rem;margin-bottom:14px;line-height:1.4;}
+.quiz-opts{display:flex;flex-direction:column;gap:7px;margin-bottom:13px;}
+.quiz-opt{background:rgba(255,255,255,.055);border:2px solid rgba(255,255,255,.1);border-radius:12px;padding:11px 15px;cursor:pointer;font-weight:700;font-size:.85rem;text-align:left;color:var(--txt);font-family:'Nunito',sans-serif;transition:all .2s;}
+.quiz-opt:hover:not(.dis){border-color:var(--lavender);background:rgba(167,139,250,.1);transform:translateX(4px);}
+.quiz-opt.ok{border-color:var(--mint);background:rgba(0,212,170,.13);color:var(--mint);}
+.quiz-opt.bad{border-color:var(--accent);background:rgba(233,69,96,.1);color:#ff8fa3;}
+.quiz-opt.dis{cursor:not-allowed;}
+.qfb{border-radius:12px;padding:10px 13px;font-weight:700;font-size:.83rem;display:none;margin-bottom:9px;}
+.qfb.show{display:block;}
+.qfb.ok{background:rgba(0,212,170,.1);color:var(--mint);border:1.5px solid rgba(0,212,170,.26);}
+.qfb.bad{background:rgba(233,69,96,.09);color:#ff8fa3;border:1.5px solid rgba(233,69,96,.26);}
+
+/* Reward */
+.reward-box{max-width:440px;margin:20px auto;text-align:center;padding:26px 20px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:24px;}
+.r-trophy{font-size:4.8rem;display:block;animation:bnc 1s ease-in-out infinite;}
+@keyframes bnc{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-13px) scale(1.06)}}
+.r-title{font-family:'Fredoka One',cursive;font-size:1.9rem;color:var(--gold);margin:9px 0 4px;}
+.r-stars{font-size:1.6rem;letter-spacing:5px;margin:6px 0;}
+.r-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(245,166,35,.17),rgba(255,140,105,.12));border:1.5px solid rgba(245,166,35,.35);border-radius:50px;padding:5px 15px;font-weight:700;font-size:.8rem;color:var(--gold);margin-bottom:14px;}
+.r-msg{color:var(--txt-s);font-size:.85rem;margin-bottom:18px;}
+
+/* Inline feedback */
+.ifb{border-radius:10px;padding:8px 12px;font-weight:700;font-size:.8rem;margin-top:6px;}
+.ifb.good{background:rgba(0,212,170,.1);color:var(--mint);border:1.5px solid rgba(0,212,170,.23);}
+.ifb.hint{background:rgba(245,166,35,.09);color:var(--gold);border:1.5px solid rgba(245,166,35,.2);}
+
+/* Breath */
+#bc{width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--lavender),var(--mint),var(--lavender));margin:0 auto 9px;display:flex;align-items:center;justify-content:center;font-size:2.4rem;transition:transform 1.2s ease;box-shadow:0 0 34px rgba(167,139,250,.36);}
+#bl{font-family:'Fredoka One',cursive;font-size:1.05rem;color:var(--lavender);text-align:center;margin-bottom:9px;min-height:24px;}
+
+/* Confetti */
+.cp{position:fixed;border-radius:2px;animation:cfal linear forwards;pointer-events:none;z-index:9999;}
+@keyframes cfal{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* ════════════════════════════════
+   THERAPIST
+════════════════════════════════ */
+#th-root{display:none;height:calc(100vh - 50px);flex-direction:column;}
+#th-root.active{display:flex;}
+.th-join{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;}
+.th-join-card{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:24px;padding:34px 30px;text-align:center;max-width:400px;width:100%;}
+.th-icon{font-size:3.8rem;display:block;margin-bottom:12px;}
+.th-title{font-family:'Fredoka One',cursive;font-size:1.75rem;color:var(--mint);margin-bottom:5px;}
+.th-sub{color:var(--txt-s);font-size:.86rem;margin-bottom:22px;line-height:1.6;}
+.code-inp{width:100%;background:rgba(255,255,255,.08);border:2px solid rgba(0,212,170,.3);border-radius:50px;padding:13px 20px;font-family:'Fredoka One',cursive;font-size:2rem;color:var(--mint);text-align:center;letter-spacing:.22em;margin-bottom:13px;transition:border-color .2s;}
+.code-inp:focus{outline:none;border-color:var(--mint);}
+.code-inp::placeholder{color:rgba(0,212,170,.22);font-size:1.1rem;letter-spacing:.1em;}
+.join-err{color:#ff8fa3;font-size:.8rem;font-weight:700;margin-top:7px;display:none;}
+
+/* Dashboard layout */
+.th-dash{display:none;flex:1;overflow:hidden;}
+.th-dash.active{display:flex;}
+.col{display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border);}
+.col:last-child{border-right:none;}
+.col-left{width:320px;flex-shrink:0;display:flex;flex-direction:column;}
+.col-mid{flex:1;}
+.col-right{width:250px;flex-shrink:0;}
+.col-head{padding:12px 14px;border-bottom:1px solid var(--border);}
+.col-ttl{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:1px;}
+.col-ttl.mint{color:var(--mint);}
+.col-ttl.gold{color:var(--gold);}
+.col-ttl.lav{color:var(--lavender);}
+.col-sub{font-size:.68rem;color:var(--txt-s);}
+.col-body{flex:1;overflow-y:auto;padding:11px;}
+.col-body::-webkit-scrollbar{width:3px;}
+.col-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+
+/* Live cards */
+.live-card{background:var(--card);border:1.5px solid var(--border);border-radius:13px;padding:12px;margin-bottom:9px;}
+.lc-title{font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--txt-s);margin-bottom:7px;}
+.lc-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;font-size:.79rem;}
+.lc-lbl{color:var(--txt-s);font-weight:600;}
+.lc-val{font-weight:700;}
+.lc-val.gold{color:var(--gold);}
+.lc-val.mint{color:var(--mint);}
+.screen-tag{display:inline-block;background:rgba(167,139,250,.14);border:1.5px solid rgba(167,139,250,.28);border-radius:7px;padding:2px 9px;font-size:.69rem;font-weight:700;color:var(--lavender);}
+
+/* Module list */
+.mp-item{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);font-size:.74rem;font-weight:600;margin-bottom:4px;}
+.mp-item.done{background:rgba(0,212,170,.08);border-color:rgba(0,212,170,.23);color:var(--mint);}
+.mp-item.current{background:rgba(245,166,35,.08);border-color:rgba(245,166,35,.23);color:var(--gold);}
+.mp-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.14);flex-shrink:0;}
+.mp-item.done .mp-dot{background:var(--mint);}
+.mp-item.current .mp-dot{background:var(--gold);animation:pulse 1.5s ease-in-out infinite;}
+
+/* Activity feed */
+.af-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:7px 10px;font-size:.74rem;margin-bottom:5px;}
+.af-time{font-size:.64rem;color:var(--txt-s);font-weight:600;margin-bottom:1px;}
+.af-txt{color:rgba(240,240,248,.84);font-weight:600;line-height:1.4;}
+.af-item.good{border-color:rgba(0,212,170,.2);background:rgba(0,212,170,.05);}
+.af-item.bad{border-color:rgba(233,69,96,.2);background:rgba(233,69,96,.04);}
+
+/* Prompt tabs */
+.ptabs{display:flex;border-bottom:1px solid var(--border);}
+.ptab{flex:1;padding:8px 4px;border:none;background:transparent;color:var(--txt-s);font-family:'DM Sans',sans-serif;font-weight:600;font-size:.7rem;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;}
+.ptab.active{color:var(--mint);border-bottom-color:var(--mint);background:rgba(0,212,170,.05);}
+
+/* Prompt cards */
+.tp-card{border-radius:10px;padding:9px 11px;margin-bottom:7px;font-size:.76rem;line-height:1.54;}
+.tp-card .lbl{font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:3px;}
+.tp-card.prompt{background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.17);}
+.tp-card.prompt .lbl{color:var(--mint);}
+.tp-card.observe{background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.17);}
+.tp-card.observe .lbl{color:var(--gold);}
+.tp-card .body{color:rgba(240,240,248,.82);}
+
+/* Notes */
+.notes-lbl{font-size:.66rem;color:var(--txt-s);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;}
+.notes-ta{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:8px;font-family:'DM Sans',sans-serif;font-size:.75rem;color:var(--txt);resize:none;line-height:1.5;transition:border-color .2s;margin-bottom:7px;}
+.notes-ta:focus{outline:none;border-color:rgba(0,212,170,.32);}
+.notes-ta.s{min-height:72px;}
+.notes-ta.m{min-height:100px;}
+.saved-badge{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.22);border-radius:7px;padding:2px 9px;font-size:.66rem;font-weight:700;color:var(--mint);display:none;margin-bottom:5px;}
+
+/* Checklist */
+.cl-item{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);font-size:.74rem;font-weight:600;cursor:pointer;margin-bottom:4px;transition:all .2s;}
+.cl-item:hover{border-color:rgba(0,212,170,.28);}
+.cl-item.checked{background:rgba(0,212,170,.07);border-color:rgba(0,212,170,.22);color:var(--mint);}
+.cl-chk{width:15px;height:15px;border-radius:4px;border:1.5px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:.62rem;flex-shrink:0;transition:all .2s;}
+.cl-item.checked .cl-chk{background:var(--mint);border-color:var(--mint);color:#0a1628;}
+.dc-bar{background:rgba(233,69,96,.09);border:1px solid rgba(233,69,96,.22);border-radius:9px;padding:8px 11px;font-size:.76rem;font-weight:700;color:#ff8fa3;margin-bottom:7px;display:none;}
+
+/* ── FOOTER ── */
+.footer{position:fixed;bottom:0;left:0;right:0;padding:5px 18px;background:rgba(0,0,0,.5);border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;z-index:200;backdrop-filter:blur(8px);}
+.footer-tag{font-family:'Fredoka One',cursive;font-size:.72rem;background:linear-gradient(135deg,var(--gold),var(--peach));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.footer-copy{font-size:.65rem;color:rgba(240,240,248,.3);font-weight:600;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo"><span class="cat-bob">🐱</span> Coping Cat</div>
+  <div class="topbar-mid">
+    <div class="pill pill-gray" id="role-pill" style="display:none"></div>
+    <div class="pill pill-gray" id="session-pill" style="display:none"></div>
+    <div class="pill pill-gray" id="conn-pill" style="display:none"></div>
+    <div class="pill pill-gold" id="stars-pill" style="display:none">⭐ <span id="sc">0</span></div>
+  </div>
+  <button class="btn btn-ghost btn-sm" id="leave-btn" style="display:none;" onclick="leaveSession()">← Leave</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     ROLE SELECTION
+══════════════════════════════════════ -->
+<div id="role-screen" class="screen active">
+  <div class="role-screen">
+    <div class="role-card">
+      <span class="role-cat">🌿</span>
+      <div class="role-title" style="background:linear-gradient(135deg,var(--mint),var(--lavender));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Therapist Portal</div>
+      <p class="role-sub">Michelle S. Coleman, LPC<br>Enter your client's session code to connect to their live game.</p>
+      <div class="role-btns" style="grid-template-columns:1fr;">
+        <div class="role-btn therapist" onclick="chooseRole('therapist')">
+          <span class="rb-icon">🌿</span>
+          <div class="rb-title">Open Dashboard</div>
+          <div class="rb-desc">Connect to client session &amp; view live screen</div>
+        </div>
+      </div>
+      <div style="margin-top:22px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);">
+        <div style="font-family:'Fredoka One',cursive;font-size:1rem;background:linear-gradient(135deg,var(--gold),var(--peach));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:5px;">Playful Strategies for Real Life Challenges</div>
+        <div style="font-size:.72rem;color:var(--txt-s);font-weight:600;margin-bottom:2px;">Created by Michelle S. Coleman, LPC</div>
+        <div style="font-size:.68rem;color:rgba(240,240,248,.35);font-weight:600;">© Michelle S. Coleman LPC PLLC — All Rights Reserved</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     THERAPIST FLOW
+══════════════════════════════════════ -->
+<div id="th-root">
+
+  <!-- Join -->
+  <div class="th-join" id="th-join">
+    <div class="th-join-card">
+      <span class="th-icon">🌿</span>
+      <div class="th-title">Join a Session</div>
+      <p class="th-sub">Ask your client for their <strong>4-digit session code</strong> and type it below to connect to their game in real time.</p>
+      <input class="code-inp" id="th-code-inp" type="text" maxlength="4" placeholder="0000" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+      <button class="btn btn-mint btn-full" onclick="joinSession()">🔗 Join Session</button>
+      <div class="join-err" id="join-err"></div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:.74rem;color:var(--txt-s);line-height:1.6;">
+        💡 No accounts needed. Your client generates the code when they open the app.
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="th-dash" id="th-dash">
+
+    <!-- Left: live screen mirror -->
+    <div class="col col-left">
+      <div class="col-head" style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div class="col-ttl mint">📡 Client Screen</div>
+          <div class="col-sub">Live mirror of what your client sees</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="lc-val gold" style="font-size:.8rem;">⭐ <span id="lv-stars">0</span></span>
+          <span class="screen-tag" id="lv-screen">—</span>
+        </div>
+      </div>
+      <div class="dc-bar" id="dc-bar" style="margin:8px 10px 0;">⚠️ Client disconnected...</div>
+
+      <!-- Waiting placeholder -->
+      <div id="mirror-waiting" style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:30px;text-align:center;color:var(--txt-s);">
+        <span style="font-size:3rem;opacity:.35;">📱</span>
+        <div style="font-size:.82rem;font-weight:600;">Waiting for client to connect...</div>
+        <div style="font-size:.74rem;">Their screen will appear here</div>
+      </div>
+
+      <!-- Live mirror frame -->
+      <div id="mirror-frame" style="display:none;flex:1;overflow:hidden;position:relative;flex-direction:column;">
+        <!-- Mini topbar with read aloud -->
+        <div style="display:flex;align-items:center;padding:5px 10px;background:rgba(0,0,0,.5);border-bottom:1px solid rgba(255,255,255,.08);gap:7px;flex-shrink:0;">
+          <span style="font-family:'Fredoka One',cursive;font-size:.75rem;color:var(--gold);">🐱 Coping Cat</span>
+          <div style="flex:1"></div>
+          <span style="font-size:.68rem;font-weight:700;color:var(--gold);">⭐ <span id="mirror-stars">0</span></span>
+        </div>
+        <!-- Read Aloud bar -->
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(167,139,250,.07);border-bottom:1px solid rgba(167,139,250,.15);flex-shrink:0;">
+          <button id="read-btn" onclick="readAloud()" style="display:flex;align-items:center;gap:5px;background:linear-gradient(135deg,#a78bfa,#818cf8);border:none;border-radius:50px;padding:5px 12px;font-family:'Fredoka One',cursive;font-size:.75rem;color:white;cursor:pointer;transition:transform .15s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            🔊 Read Aloud
+          </button>
+          <button id="stop-btn" onclick="stopReading()" style="display:none;align-items:center;gap:5px;background:rgba(233,69,96,.2);border:1.5px solid rgba(233,69,96,.35);border-radius:50px;padding:5px 12px;font-family:'Fredoka One',cursive;font-size:.75rem;color:#ff8fa3;cursor:pointer;">
+            ⏹ Stop
+          </button>
+          <div id="reading-indicator" style="display:none;font-size:.7rem;color:#a78bfa;font-weight:700;animation:pulse 1.5s ease-in-out infinite;">📢 Reading...</div>
+          <div style="flex:1"></div>
+          <div style="font-size:.67rem;color:rgba(240,240,248,.35);font-weight:600;">For low-literacy support</div>
+        </div>
+        <!-- Scrollable mirror content -->
+        <div id="mirror-content" style="flex:1;overflow-y:auto;padding:12px;font-size:0.78em;transform-origin:top left;">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Activity feed at bottom -->
+      <div style="border-top:1px solid var(--border);padding:8px 10px;flex-shrink:0;max-height:160px;overflow-y:auto;">
+        <div style="font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--txt-s);margin-bottom:5px;">Activity Feed</div>
+        <div id="lv-feed"><div class="af-item"><div class="af-time">—</div><div class="af-txt">Waiting for client to start...</div></div></div>
+      </div>
+    </div>
+
+    <!-- Mid: prompts -->
+    <div class="col col-mid">
+      <div class="col-head">
+        <div class="col-ttl gold">💬 Clinical Prompts</div>
+        <div class="col-sub">Auto-updates based on client's current module</div>
+      </div>
+      <div class="ptabs">
+        <button class="ptab active" onclick="pTab('discussion',this)">💬 Discussion</button>
+        <button class="ptab" onclick="pTab('observe',this)">👀 Observe</button>
+        <button class="ptab" onclick="pTab('skills',this)">🎯 Skills</button>
+        <button class="ptab" onclick="pTab('crisis',this)">🚨 Crisis</button>
+      </div>
+      <div class="col-body" id="prompt-body"></div>
+    </div>
+
+    <!-- Right: notes -->
+    <div class="col col-right">
+      <div class="col-head">
+        <div class="col-ttl lav">📝 Session Notes</div>
+        <div class="col-sub">Private — client cannot see these</div>
+      </div>
+      <div class="col-body">
+        <div class="saved-badge" id="saved-badge">✓ Saved</div>
+        <div class="notes-lbl">Session Notes</div>
+        <textarea class="notes-ta m" placeholder="General notes..." oninput="autoSave()"></textarea>
+        <div class="notes-lbl">Client Responses</div>
+        <textarea class="notes-ta s" placeholder="Notable quotes & reactions..." oninput="autoSave()"></textarea>
+        <div class="notes-lbl">Follow-up</div>
+        <textarea class="notes-ta s" placeholder="For next session..." oninput="autoSave()"></textarea>
+        <div class="notes-lbl" style="margin-top:3px;">Session Checklist</div>
+        ${['Opening check-in done','Goals set','Connected to real life','Practiced coping skill','Homework assigned','Closing check-in done'].map(t=>`<div class="cl-item" onclick="this.classList.toggle('checked')"><div class="cl-chk">✓</div>${t}</div>`).join('')}
+      </div>
+    </div>
+
+  </div><!-- /th-dash -->
+</div><!-- /th-root -->
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/paho-mqtt.min.js"></script>
+
+<div class="footer">
+  <div class="footer-tag">🐱 Playful Strategies for Real Life Challenges</div>
+  <div class="footer-copy">© Michelle S. Coleman LPC PLLC — All Rights Reserved</div>
+</div>
+<script>
+
+// ── STATE ──
+let ROLE = null; // 'child' | 'therapist'
+let mqttClient = null;
+let sessionCode = null;
+let therapistConnected = false;
+let activityLog = [];
+let lastChildState = null;
+let currentPromptTab = 'discussion';
+let currentModId = null;
+let saveDebounce = null;
+let btmr = null;
+
+const S = { name:'', av:'🐱', stars:0, completed:[], badges:[], mod:null, step:0, qi:0, qc:0, screen:'setup', lastActivity:'' };
+
+const MODS_META = [
+  {id:'feelings', label:'🔍 Feelings Detective'},
+  {id:'body',     label:'🫀 Body Clues'},
+  {id:'thoughts', label:'💭 Thought Checker'},
+  {id:'fear',     label:'🦁 FEAR Plan'},
+  {id:'coping',   label:'🧰 Coping Toolbox'},
+  {id:'brave',    label:'🦸 Brave Adventures'},
+];
+
+// ── ROLE SELECTION ──
+function chooseRole(role) {
+  ROLE = 'therapist';
+  hide('role-screen');
+  document.getElementById('th-root').classList.add('active');
+  setPill('role-pill','pill-mint','🌿 Therapist');
+  showEl('role-pill');
+}
+
+// ── THERAPIST: JOIN ──
+function joinSession() {
+  const code = document.getElementById('th-code-inp').value.trim();
+  const err = document.getElementById('join-err');
+  if (code.length!==4) { err.style.display='block'; err.textContent='❌ Please enter a 4-digit code.'; return; }
+  sessionCode = code; err.style.display='none';
+
+  const clientId = 'therapist_'+Math.random().toString(36).substr(2,9);
+  mqttClient = new Paho.Client('broker.hivemq.com', 8884, '/mqtt', clientId);
+  mqttClient.onConnectionLost = () => { setPill('conn-pill','pill-red','⚡ Disconnected'); document.getElementById('dc-bar').style.display='block'; };
+  mqttClient.onMessageArrived = msg => { try { handleAsTherapist(JSON.parse(msg.payloadString)); } catch(e){} };
+
+  mqttClient.connect({ useSSL:true, timeout:10,
+    onSuccess: () => {
+      mqttClient.subscribe('copingcat/'+sessionCode+'/child');
+      setPill('session-pill','pill-mint','🔑 '+sessionCode); showEl('session-pill');
+      setPill('conn-pill','pill-waiting','⏳ Waiting for client'); showEl('conn-pill');
+      document.getElementById('th-join').style.display='none';
+      document.getElementById('th-dash').classList.add('active');
+      showEl('leave-btn');
+      publishToChild({type:'joined'});
+      setTimeout(()=>publishToChild({type:'ping'}),800);
+      renderModProgress(null);
+      renderPrompts(null);
+    },
+    onFailure: () => { err.style.display='block'; err.textContent='❌ Connection failed. Please try again.'; }
+  });
+}
+
+function publishToChild(data) {
+  if (!mqttClient || !mqttClient.isConnected()) return;
+  const msg = new Paho.Message(JSON.stringify(data));
+  msg.destinationName = 'copingcat/'+sessionCode+'/therapist';
+  mqttClient.send(msg);
+}
+
+function handleAsTherapist(data) {
+  if (data.type!=='state') return;
+  document.getElementById('dc-bar').style.display='none';
+  setPill('conn-pill','pill-mint','🟢 Client connected');
+  updateThDash(data);
+  logActivity(data);
+  if (data.modId !== currentModId) { currentModId=data.modId; renderPrompts(data); }
+  lastChildState = data;
+}
+
+function updateThDash(d) {
+  document.getElementById('lv-stars').textContent = d.stars||0;
+  document.getElementById('mirror-stars').textContent = d.stars||0;
+  document.getElementById('lv-screen').textContent = screenLabel(d);
+  renderMirror(d);
+  renderModProgress(d);
+}
+
+function renderMirror(d) {
+  document.getElementById('mirror-waiting').style.display = 'none';
+  document.getElementById('mirror-frame').style.display = 'flex';
+  document.getElementById('mirror-frame').style.flexDirection = 'column';
+
+  // Update the read aloud script whenever the screen changes
+  currentReadScript = buildReadScript(d);
+
+  const mc = document.getElementById('mirror-content');
+  const av = d.avatar || '🐱';
+  const name = d.name || 'Hero';
+
+  if (d.screen === 'home') {
+    const badges = (d.badges||[]).map(b=>`<span style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:50px;padding:2px 8px;font-size:.72em;font-weight:700;color:#f5a623;margin:2px;">${b}</span>`).join('');
+    const mods = MODS_META.map((m,i)=>{
+      const done=(d.completed||[]).includes(m.id);
+      const locked=i>0&&!(d.completed||[]).includes(MODS_META[i-1].id);
+      return `<div style="background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 8px;text-align:center;opacity:${locked?.4:1};">
+        <div style="font-size:1.6em;margin-bottom:4px;">${m.label.split(' ')[0]}</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:.85em;">${m.label.slice(2)}</div>
+        ${done?'<div style="color:#00d4aa;font-size:.7em;margin-top:3px;">✓ Done</div>':locked?'<div style="font-size:.7em;margin-top:3px;opacity:.5;">🔒</div>':''}
+      </div>`;
+    }).join('');
+    mc.innerHTML = `
+      <div style="text-align:center;margin-bottom:12px;">
+        <div style="font-size:2.5em;">${av}</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:1.1em;color:#f5a623;">Hi, ${name}! 👋</div>
+        <div style="font-size:.75em;color:rgba(240,240,248,.5);margin-top:2px;">Choose a mission!</div>
+      </div>
+      ${badges ? `<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:3px;margin-bottom:10px;">${badges}</div>` : ''}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">${mods}</div>`;
+
+  } else if (d.screen === 'lesson' && d.modId) {
+    const mod = MODS.find(m=>m.id===d.modId);
+    if (!mod) return;
+    const step = mod.steps[d.step||0];
+    const totalSteps = mod.steps.length;
+    const dots = Array.from({length:totalSteps},(_,i)=>`<div style="width:8px;height:8px;border-radius:50%;background:${i<d.step?'#00d4aa':i===d.step?'#f5a623':'rgba(255,255,255,.15)'};display:inline-block;margin:0 2px;transition:all .3s;"></div>`).join('');
+    mc.innerHTML = `
+      <div style="display:flex;justify-content:center;gap:3px;margin-bottom:10px;">${dots}</div>
+      <div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:12px;">
+        <span style="font-size:2em;flex-shrink:0;">${av}</span>
+        <div style="background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.14);border-radius:12px;border-bottom-left-radius:3px;padding:9px 12px;font-size:.85em;font-weight:600;line-height:1.5;flex:1;">${step.cat}</div>
+      </div>
+      <div style="background:rgba(255,255,255,.055);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:14px;font-size:.85em;">${step.html}</div>`;
+
+  } else if (d.screen === 'quiz' && d.modId) {
+    const mod = MODS.find(m=>m.id===d.modId);
+    if (!mod) return;
+    const q = mod.quiz[d.qi||0];
+    const pct = ((d.qi||0)/mod.quiz.length*100).toFixed(0);
+    mc.innerHTML = `
+      <div style="background:rgba(255,255,255,.09);border-radius:50px;height:6px;overflow:hidden;margin-bottom:12px;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#a78bfa,#00d4aa);border-radius:50px;transition:width .5s;"></div>
+      </div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1em;margin-bottom:10px;line-height:1.4;">🤔 ${q.q}</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${q.opts.map(o=>`<div style="background:rgba(255,255,255,.055);border:1.5px solid rgba(255,255,255,.1);border-radius:10px;padding:9px 12px;font-weight:700;font-size:.85em;">${o}</div>`).join('')}
+      </div>`;
+
+  } else if (d.screen === 'reward') {
+    mc.innerHTML = `
+      <div style="text-align:center;padding:16px 8px;">
+        <div style="font-size:3.5em;margin-bottom:8px;">🏆</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:1.4em;color:#f5a623;margin-bottom:4px;">You did it!</div>
+        <div style="font-size:1.3em;letter-spacing:4px;margin-bottom:8px;">⭐⭐⭐</div>
+        <div style="background:rgba(245,166,35,.12);border:1.5px solid rgba(245,166,35,.3);border-radius:50px;padding:5px 14px;display:inline-block;font-weight:700;font-size:.8em;color:#f5a623;">🏅 Badge Earned!</div>
+        <div style="color:rgba(240,240,248,.5);font-size:.78em;margin-top:10px;">Got ${d.qc||0} out of ${MODS.find(m=>m.id===d.modId)?.quiz?.length||4} correct!</div>
+      </div>`;
+
+  } else {
+    mc.innerHTML = `<div style="text-align:center;padding:30px;color:rgba(240,240,248,.4);font-size:.85em;">Client is setting up...</div>`;
+  }
+}
+
+function screenLabel(d) {
+  if (!d.screen||d.screen==='setup'||d.screen==='waiting') return 'Setting up...';
+  if (d.screen==='home') return 'Home Screen';
+  const m = MODS_META.find(x=>x.id===d.modId);
+  if (d.screen==='lesson') return (m?m.label:'Lesson')+' — Step '+(d.step+1);
+  if (d.screen==='quiz') return (m?m.label:'Quiz')+' Q'+(d.qi+1);
+  if (d.screen==='reward') return '🏆 Reward Screen';
+  return d.screen;
+}
+
+function renderModProgress(d) {
+  // Module progress is now shown in the mirror grid on the home screen
+}
+
+function logActivity(d) {
+  if (!d.lastActivity) return;
+  if (activityLog.length && activityLog[0].txt===d.lastActivity) return;
+  const now=new Date(), time=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  const good=d.lastActivity.includes('✅')||d.lastActivity.includes('Correct')||d.lastActivity.includes('Completed');
+  const bad=d.lastActivity.includes('❌')||d.lastActivity.includes('Incorrect');
+  activityLog.unshift({time,txt:d.lastActivity,good,bad});
+  if(activityLog.length>20) activityLog.pop();
+  document.getElementById('lv-feed').innerHTML = activityLog.map(a=>
+    `<div class="af-item${a.good?' good':a.bad?' bad':''}"><div class="af-time">${a.time}</div><div class="af-txt">${a.txt}</div></div>`).join('');
+}
+
+// ── PROMPTS ──
+function pTab(tab,el) {
+  currentPromptTab=tab;
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
+  renderPrompts(lastChildState);
+}
+
+function renderPrompts(d) {
+  const modId = d ? d.modId : null;
+  const cards = getCards(modId, currentPromptTab);
+  document.getElementById('prompt-body').innerHTML = cards.map(c=>
+    `<div class="tp-card ${c.t}"><div class="lbl">${c.l}</div><div class="body">${c.b}</div></div>`).join('');
+}
+
+function getCards(modId, tab) {
+  if (tab==='crisis') return crisisCards();
+  const map = {feelings:feelCards,body:bodyCards,thoughts:thoughtCards,fear:fearCards,coping:copingCards,brave:braveCards};
+  return (modId && map[modId]) ? map[modId](tab) : defaultCards(tab);
+}
+
+function C(t,l,b){return{t,l,b};}
+function defaultCards(tab){
+  if(tab==='discussion') return [C('prompt','💬 Opening Check-in','"On a scale of 1–5, how are you feeling right now?" Ask before any module begins.'),C('prompt','🎯 Goal Setting','"What\'s one thing you\'d like to get better at today?" Invite a small, specific goal.'),C('prompt','🔗 Generalization','After each module: "Has anything like this ever happened to you in real life?"')];
+  if(tab==='observe') return [C('observe','👀 Watch For','Notice which modules the child avoids or rushes toward — both directions are clinically informative.'),C('observe','🎭 Engagement','Body language, willingness to engage, and spontaneous sharing all provide rich clinical data.')];
+  if(tab==='skills') return [C('prompt','📋 Curriculum Overview','This app covers: Feelings identification, Body awareness, Cognitive restructuring, FEAR plan, Coping strategies, and Graduated exposure.')];
+  return [];
+}
+function feelCards(tab){
+  if(tab==='discussion') return [C('prompt','💬 Before Module','"Tell me about a time you felt a really strong feeling this week?" Let the child lead.'),C('prompt','🌡️ Thermometer','"Where would you put your worry about [real thing] on this scale right now?"'),C('prompt','🏠 Generalize','"Can you think of a feeling from school or home? What number on the thermometer?"')];
+  if(tab==='observe') return [C('observe','👀 Watch For','Does the child readily identify anxious feelings, or avoid naming them? Avoidance of naming anxiety is clinically meaningful.'),C('observe','🎭 Affect Match','Does their expression match what they select? Disconnect is worth noting.')];
+  if(tab==='skills') return [C('prompt','🎯 Skills','• Emotion identification and labeling\n• Emotion intensity rating\n• Connecting feelings to triggering situations')];
+  return defaultCards(tab);
+}
+function bodyCards(tab){
+  if(tab==='discussion') return [C('prompt','💬 Body Awareness','"Where do you usually feel worry in your body?" Track this across sessions.'),C('prompt','🌬️ Breathe Together','Do belly breathing WITH the child. "Let\'s try this together — hand on your belly."'),C('prompt','🔗 Experience','"Has your body ever felt like this? Can you remember a time your heart was pounding?"')];
+  if(tab==='observe') return [C('observe','👀 Somatic Patterns','Which body locations does the child identify consistently? Patterns inform their coping plan.'),C('observe','📋 Breathing Response','Does the child engage readily with breathing, or resist? Resistance may need gentle exploration.')];
+  if(tab==='skills') return [C('prompt','🎯 Skills','• Fight-or-flight psychoeducation\n• Body scan and somatic awareness\n• Diaphragmatic (belly) breathing')];
+  return defaultCards(tab);
+}
+function thoughtCards(tab){
+  if(tab==='discussion') return [C('prompt','💬 Thought Catching','"What does your worried voice say when you\'re anxious?" Normalize without judgment.'),C('prompt','🧪 Thought Lab','"Let\'s be thought scientists — we test if the thought is really 100% true."'),C('prompt','🏠 Homework','Thought journal: "Write one tricky thought and your helpful replacement this week."')];
+  if(tab==='observe') return [C('observe','👀 Cognitive Style','Note catastrophizing, mind-reading, or all-or-nothing thinking — key CBT targets.'),C('observe','✏️ Reframing Ease','Does the child generate alternatives easily, or struggle? Difficulty may indicate entrenched schemas.')];
+  if(tab==='skills') return [C('prompt','🎯 Skills','• Identifying unhelpful thoughts\n• Cognitive restructuring\n• "Is this 100% true?" thought challenging')];
+  return defaultCards(tab);
+}
+function fearCards(tab){
+  if(tab==='discussion') return [C('prompt','💬 Introduce','"I\'m going to teach you a 4-step cheat code for worries. It\'s called the FEAR plan."'),C('prompt','📝 Real Worry','"What worry would YOU most like to try the FEAR plan on? Something real from your life."'),C('prompt','🏠 Homework','"Use the FEAR plan once this week on something small. Bring it back next session."')];
+  if(tab==='observe') return [C('observe','👀 The E Step','The "Expecting" step reveals cognitive distortions. Are their expectations realistic or catastrophized?'),C('observe','🦁 Bravery','"I can\'t" vs "I can try" in response to bravery framing is clinically informative.')];
+  if(tab==='skills') return [C('prompt','🎯 Skills','• FEAR acronym (Feeling, Expecting, Attitudes/Actions, Results)\n• Self-talk strategies\n• Action planning under anxiety')];
+  return defaultCards(tab);
+}
+function copingCards(tab){
+  if(tab==='discussion') return [C('prompt','💬 Personalize','"Let\'s find YOUR personal favorites — tools that could actually work for you." Narrow to 2–3.'),C('prompt','🌍 Ground Now','Practice 5-4-3-2-1 together right now: "Find 5 things you can see in this room."'),C('prompt','📌 Coping Card','Create a personal Coping Card: 3 go-to strategies for when anxiety spikes outside sessions.')];
+  if(tab==='observe') return [C('observe','👀 Tool Choice','Which tools does the child gravitate toward? Reveals coping style and homework feasibility.'),C('observe','🏃 Feasibility','"Which could you actually use at school or in public?" Real-world transfer matters.')];
+  if(tab==='skills') return [C('prompt','🎯 Skills','• Coping strategy menu building\n• 5-4-3-2-1 grounding\n• Matching tools to situation type')];
+  return defaultCards(tab);
+}
+function braveCards(tab){
+  if(tab==='discussion') return [C('prompt','💬 Exposure','"What\'s one thing you\'ve been avoiding because it worries you?" Normalize avoidance first.'),C('prompt','🏗️ Ladder Help','Help make steps specific and graduated. Too-big steps discourage; too-small bore.'),C('prompt','🎯 First Step','"Which step could you try before our next session? Let\'s be specific — when, where, who?"')];
+  if(tab==='observe') return [C('observe','👀 Avoidance','How much does avoidance interfere with daily functioning — school, friends, activities?'),C('observe','🎁 Reward','Does the child identify reinforcers readily? Involve parents if available.')];
+  if(tab==='skills') return [C('prompt','🎯 Skills','• Worry ladder construction\n• Graduated exposure principles\n• Self-reward and reinforcement planning')];
+  return defaultCards(tab);
+}
+function crisisCards(){return[
+  C('observe','🚨 If Distressed','Pause the game immediately. "I noticed that seemed to land differently. Want to take a break?" Do not push through.'),
+  C('observe','😰 Signs of Overwhelm','Watch for: sudden silence, tearfulness, shutting down, deflection with humor, or requesting to stop.'),
+  C('prompt','🧸 Grounding','Use belly breathing together right now. "Put your hand on your belly... breathe in slowly..."'),
+  C('prompt','🔒 Safeguarding','If a child discloses anything concerning, follow your standard protocol. The game is a tool — your clinical judgment leads.'),
+  C('prompt','📞 Parent/Guardian','Consider looping in a parent if the child is distressed beyond what you can support in telehealth alone.'),
+];}
+
+// ── SHARED UTILS ──
+function leaveSession() { if(mqttClient&&mqttClient.isConnected()) mqttClient.disconnect(); location.reload(); }
+
+// ── READ ALOUD ──
+let currentReadScript = '';
+
+function buildReadScript(d) {
+  if (!d || !d.screen) return '';
+  const name = d.name || 'your client';
+  const av = d.avatar || '';
+
+  if (d.screen === 'home') {
+    const doneCount = (d.completed||[]).length;
+    return `${name} is on the home screen. They have earned ${d.stars||0} stars and completed ${doneCount} out of 6 modules. ${doneCount === 0 ? 'They haven\'t started any modules yet.' : 'Modules completed: ' + (d.completed||[]).join(', ') + '.'}`;
+  }
+
+  if (d.screen === 'lesson' && d.modId) {
+    const mod = MODS.find(m=>m.id===d.modId);
+    if (!mod) return '';
+    const step = mod.steps[d.step||0];
+    // Strip HTML tags for speech
+    const catText = step.cat;
+    const bodyText = step.html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+    return `${name} is on Step ${(d.step||0)+1} of ${mod.steps.length} in the ${mod.name} module. The cat says: "${catText}". The screen shows: ${bodyText}`;
+  }
+
+  if (d.screen === 'quiz' && d.modId) {
+    const mod = MODS.find(m=>m.id===d.modId);
+    if (!mod) return '';
+    const q = mod.quiz[d.qi||0];
+    const opts = q.opts.map((o,i)=>`Option ${i+1}: ${o}`).join('. ');
+    return `${name} is on Quiz Question ${(d.qi||0)+1} of ${mod.quiz.length} for the ${mod.name} module. The question is: ${q.q}. The answer choices are: ${opts}.`;
+  }
+
+  if (d.screen === 'reward') {
+    const mod = MODS.find(m=>m.id===d.modId);
+    return `${name} just completed the ${mod ? mod.name : ''} module! They got ${d.qc||0} out of ${mod ? mod.quiz.length : 4} quiz questions correct. Time to celebrate!`;
+  }
+
+  return `${name} is setting up their session.`;
+}
+
+function readAloud() {
+  if (!currentReadScript) return;
+  stopReading();
+  const utt = new SpeechSynthesisUtterance(currentReadScript);
+  utt.rate = 0.9;
+  utt.pitch = 1;
+  utt.volume = 1;
+  // Pick a clear voice if available
+  const voices = speechSynthesis.getVoices();
+  const preferred = voices.find(v=>v.lang==='en-US' && v.name.includes('Google')) || voices.find(v=>v.lang==='en-US') || voices[0];
+  if (preferred) utt.voice = preferred;
+  utt.onstart = () => {
+    document.getElementById('reading-indicator').style.display = 'flex';
+    document.getElementById('stop-btn').style.display = 'flex';
+  };
+  utt.onend = utt.onerror = () => {
+    document.getElementById('reading-indicator').style.display = 'none';
+    document.getElementById('stop-btn').style.display = 'none';
+  };
+  speechSynthesis.speak(utt);
+}
+
+function stopReading() {
+  speechSynthesis.cancel();
+  document.getElementById('reading-indicator').style.display = 'none';
+  document.getElementById('stop-btn').style.display = 'none';
+}
+function show(id){document.getElementById(id).classList.add('active');}
+function hide(id){document.getElementById(id).classList.remove('active');}
+function showEl(id){document.getElementById(id).style.display='flex';}
+function hideEl(id){document.getElementById(id).style.display='none';}
+function setPill(id,cls,txt){const el=document.getElementById(id);el.className='pill '+cls;el.textContent=txt;}
+function addStars(n){S.stars+=n;['sc','lsc'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=S.stars;});}
+function toast(msg){const t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;border:1.5px solid rgba(255,255,255,.17);color:white;font-family:"Fredoka One",cursive;padding:9px 19px;border-radius:50px;z-index:9999;box-shadow:0 5px 16px rgba(0,0,0,.4);font-size:.88rem;';document.body.appendChild(t);setTimeout(()=>t.remove(),2200);}
+function confetti(){const cls=['#f5a623','#e94560','#00d4aa','#a78bfa','#ff8c69','#60a5fa'];for(let i=0;i<55;i++){const c=document.createElement('div');c.className='cp';c.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${cls[Math.floor(Math.random()*cls.length)]};width:${5+Math.random()*9}px;height:${5+Math.random()*9}px;border-radius:${Math.random()>.5?'50%':'3px'};animation-duration:${2.5+Math.random()*2.5}s;animation-delay:${Math.random()*.6}s;`;document.body.appendChild(c);setTimeout(()=>c.remove(),5500);}}
+function autoSave(){clearTimeout(saveDebounce);saveDebounce=setTimeout(()=>{const b=document.getElementById('saved-badge');b.style.display='block';setTimeout(()=>b.style.display='none',2000);},800);}
+
+// ── MODULES DATA ──
+const MODS=[
+  {id:'feelings',name:'Feelings Detective',emoji:'🔍',desc:'Identify & name emotions',bg:'rgba(96,165,250,.11)',border:'rgba(96,165,250,.38)',badge:'🔍 Feelings Detective',steps:feelSteps(),quiz:feelQuiz()},
+  {id:'body',name:'Body Clues',emoji:'🫀',desc:'Notice body signals',bg:'rgba(233,69,96,.09)',border:'rgba(233,69,96,.38)',badge:'🫀 Body Expert',steps:bodySteps(),quiz:bodyQuiz()},
+  {id:'thoughts',name:'Thought Checker',emoji:'💭',desc:'Helpful vs unhelpful thoughts',bg:'rgba(167,139,250,.11)',border:'rgba(167,139,250,.38)',badge:'💭 Thought Checker',steps:thoughtSteps(),quiz:thoughtQuiz()},
+  {id:'fear',name:'FEAR Plan',emoji:'🦁',desc:'Step-by-step worry toolkit',bg:'rgba(245,166,35,.1)',border:'rgba(245,166,35,.38)',badge:'🦁 FEAR Fighter',steps:fearSteps(),quiz:fearQuiz()},
+  {id:'coping',name:'Coping Toolbox',emoji:'🧰',desc:'Strategies to calm down',bg:'rgba(0,212,170,.09)',border:'rgba(0,212,170,.32)',badge:'🧰 Coping Pro',steps:copingSteps(),quiz:copingQuiz()},
+  {id:'brave',name:'Brave Adventures',emoji:'🦸',desc:'Facing worries step by step',bg:'rgba(255,140,105,.09)',border:'rgba(255,140,105,.38)',badge:'🦸 Brave Hero',steps:braveSteps(),quiz:braveQuiz()},
+];
+function feelSteps(){return[{cat:"Hi! Let's learn about feelings together! 🔍",html:`<div class="sec-title">🌈 Feelings are totally normal!</div><div class="l-text">Everyone has feelings — happy, sad, worried, angry, excited. The superpower is learning to <strong>notice</strong> and <strong>name</strong> them.</div><div class="hl">💡 Naming your feeling is the very first step to feeling better!</div>`},{cat:"Feelings Detective time! Find the right feeling in this story:",html:`<div class="sec-title">🎭 Feelings Detective</div><div class="scenario">📚 First day at a new school. Tummy feels fluttery. Heart is beating fast. You don't know anyone yet...</div><div class="feel-grid">${[['😄','Happy'],['😰','Nervous'],['😡','Angry'],['😢','Sad'],['😴','Bored'],['😨','Scared']].map(([e,f])=>`<button class="feel-btn" onclick="selFeel('${f}',this)"><span class="feel-e">${e}</span>${f}</button>`).join('')}</div><div id="feel-fb" class="ifb" style="min-height:16px;"></div>`},{cat:"Feelings can be tiny OR huge! Use the thermometer!",html:`<div class="sec-title">🌡️ How BIG is the feeling?</div><div class="l-text">Think of feeling <strong>nervous</strong>. Level 1 (tiny) or level 5 (overwhelming)?</div><div class="therm-row">${[{h:42,l:'1<br>Tiny',c:'#86efac'},{h:64,l:'2<br>Small',c:'#fde68a'},{h:90,l:'3<br>Medium',c:'#fcd34d'},{h:114,l:'4<br>Big',c:'#fb923c'},{h:140,l:'5<br>Huge!',c:'#f87171'}].map((b,i)=>`<div class="t-bar" style="height:${b.h}px;background:${b.c};" onclick="pickTherm(${i+1},this)">${b.l}</div>`).join('')}</div><div id="tfb" style="text-align:center;font-weight:700;color:var(--txt-s);font-size:.83rem;"></div>`},{cat:"You're a real Feelings Detective! Quiz time! 🏆",html:`<div class="sec-title">⭐ You've learned:</div><div class="l-text">✅ All feelings are normal<br>✅ Naming feelings helps<br>✅ Feelings can be big or small<br>✅ Noticing is the first step!</div><div class="hl">🎯 Quiz time!</div>`}];}
+function bodySteps(){return[{cat:"Your body sends secret messages when you have big feelings!",html:`<div class="sec-title">🫀 Your Body Talks!</div><div class="l-text">When scared, your brain fires <strong>fight-or-flight</strong>. Heart speeds up, breathing gets faster. It's your body being a superhero!</div><div class="hl">🌿 Sometimes it fires when there's no real danger — and that's okay!</div>`},{cat:"Let's map where YOU feel worry in your body. Tap the spots!",html:`<div class="sec-title">🗺️ Your Worry Map</div><div class="body-scan"><span class="body-ico">🧍</span><div class="body-list">${[['😵','Head — dizzy or headache'],['❤️','Heart — racing'],['🤢','Tummy — butterflies'],['😮‍💨','Breathing — fast'],['🦵','Legs — shaky'],['🥵','Skin — hot or sweaty']].map(([e,b])=>`<div class="body-item" onclick="toggleBody(this)"><span>${e}</span><span>${b}</span></div>`).join('')}</div></div><div id="bfb" style="font-weight:700;font-size:.8rem;color:var(--mint);margin-top:6px;"></div>`},{cat:"Now let's try a breathing trick that calms you down fast!",html:`<div class="sec-title">🌬️ Belly Breathing</div><div class="l-text">Hand on your belly. Breathe in for <strong>4 counts</strong>, hold for <strong>2</strong>, out for <strong>6 counts</strong>.</div><div style="text-align:center;margin:14px 0;"><div id="bc">🌬️</div><div id="bl">Press Start!</div><button class="btn btn-gold btn-sm" onclick="startBreath()">▶ Start</button></div>`},{cat:"Quiz time! 💪",html:`<div class="sec-title">⭐ You've learned:</div><div class="l-text">✅ Fight-or-flight protects you<br>✅ Worry has body clues<br>✅ Belly breathing calms the body<br>✅ You can read your own signals!</div><div class="hl">💪 Quiz time!</div>`}];}
+function thoughtSteps(){return[{cat:"Thoughts are like radio stations — we can change the channel!",html:`<div class="sec-title">💭 Thoughts are powerful!</div><div class="l-text">When anxious, our brain sends <strong>unhelpful thoughts</strong> that make worries feel bigger. We can check them and change them!</div><div class="hl">🔄 You are the boss of your thoughts!</div>`},{cat:"Find the tricky thought and write a better one!",html:`<div class="sec-title">🕵️ Spot the Tricky Thought</div><div class="scenario">🎨 Maya thinks: <em>"I'm terrible at art. Everyone will laugh. I always mess up."</em></div><div class="l-text">Is that <strong>100% true?</strong> What could she think instead?</div><textarea class="g-ta" id="tbox" placeholder="Write a more helpful thought for Maya..."></textarea><div id="tfb2" class="ifb" style="min-height:14px;"></div><button class="btn btn-gold btn-sm" onclick="checkThought()">✅ Check it</button>`},{cat:"Here's the difference between helpful and unhelpful thoughts:",html:`<div class="sec-title">🆚 Helpful vs Unhelpful</div><div class="two-col"><div class="col-c col-bad"><div class="col-hd">😟 Unhelpful</div><ul><li>"I'll definitely fail"</li><li>"Everyone will laugh"</li><li>"I can't do anything"</li><li>"This will be awful"</li></ul></div><div class="col-c col-good"><div class="col-hd">😊 Helpful</div><ul><li>"I'll try my best"</li><li>"Most people are kind"</li><li>"I can handle this"</li><li>"I've done hard things"</li></ul></div></div><div class="hl">🔑 Ask: "Is this thought 100% true?"</div>`},{cat:"Quiz time! 🌟",html:`<div class="sec-title">⭐ You've learned:</div><div class="l-text">✅ Unhelpful thoughts make worries bigger<br>✅ Challenge tricky thoughts<br>✅ Ask "Is this 100% true?"<br>✅ Helpful thoughts = better feelings!</div><div class="hl">🎯 Quiz time!</div>`}];}
+function fearSteps(){return[{cat:"Meet your worry-busting superhero: The FEAR Plan!",html:`<div class="sec-title">🦁 The FEAR Plan</div><div class="fear-steps">${[['F','Feeling frightened?','Notice the worried feeling & body clues','#f87171'],['E','Expecting bad things?','What is your worried thought?','#fb923c'],['A','Attitudes & Actions that help','What can you DO or THINK?','#fbbf24'],['R','Results & Rewards!','How did it go? Celebrate!','#34d399']].map(([l,t,d,c])=>`<div class="fear-row"><div class="fear-letter" style="background:${c};">${l}</div><div><div class="fear-t">${t}</div><div class="fear-d">${d}</div></div></div>`).join('')}</div>`},{cat:"Practice the FEAR plan! Fill in each step:",html:`<div class="sec-title">📝 FEAR Plan Practice</div><div class="scenario">🎤 You have to give a speech in class tomorrow. You're really worried.</div><div id="finputs" style="margin-top:9px;">${[['F','#f87171','What are you feeling? A body clue?'],['E','#fb923c','What bad thing are you expecting?'],['A','#fbbf24','What action or thought can help?'],['R','#34d399','How will you reward yourself?']].map(([l,c,p],i)=>`<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;"><div style="width:27px;height:27px;border-radius:50%;background:${c};color:white;font-family:'Fredoka One',cursive;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${l}</div><input class="g-inp" style="margin:0;flex:1;" placeholder="${p}"></div>`).join('')}</div><div id="ffb" class="ifb" style="min-height:14px;margin-bottom:6px;"></div><button class="btn btn-gold btn-sm" onclick="fearCheck()">💪 Done!</button>`},{cat:"Brave = doing it EVEN when nervous!",html:`<div class="sec-title">💪 What Brave Looks Like</div><div class="l-text">You don't need to feel 100% ready. Just try. Every try builds your bravery muscle!</div>${[['🏊','Nervous about swimming — jumping in anyway'],['✋','Unsure of the answer — raising your hand'],['🤝','Feeling shy — saying hi to someone new']].map(([e,t])=>`<div style="display:flex;align-items:center;gap:10px;background:rgba(0,212,170,.07);border:1.5px solid rgba(0,212,170,.17);border-radius:11px;padding:9px 12px;margin-bottom:6px;"><span style="font-size:1.5rem;">${e}</span><span style="font-weight:700;font-size:.83rem;">${t}</span></div>`).join('')}`},{cat:"Quiz time, brave hero! 🏆",html:`<div class="sec-title">⭐ You've learned:</div><div class="l-text">✅ F = Feeling frightened<br>✅ E = Expecting bad things<br>✅ A = Attitudes & actions that help<br>✅ R = Results & rewards</div><div class="hl">🎯 Quiz time!</div>`}];}
+function copingSteps(){return[{cat:"Welcome to your Coping Toolbox! Tap the tools you want!",html:`<div class="sec-title">🧰 Your Coping Toolbox</div><div class="l-text">Different feelings need different tools! Tap the ones you like!</div><div class="tools-grid">${[['🌬️','Deep Breathing'],['🦵','Walk It Out'],['🎵','Hum a Song'],['✏️','Draw It Out'],['🗣️','Talk to Someone'],['🧘','Relax Your Body'],['🌳','Go Outside'],['🎮','Take a Break'],['🧊','Cool Water']].map(([e,t])=>`<div class="tool-btn" onclick="pickTool(this)"><span class="tool-e">${e}</span>${t}</div>`).join('')}</div><div id="toolfb" style="font-weight:700;color:var(--mint);font-size:.8rem;"></div>`},{cat:"This trick works anywhere in under 1 minute!",html:`<div class="sec-title">🌍 5-4-3-2-1 Grounding</div><div class="l-text">When anxiety spikes, use your senses to come back to <strong>right now</strong>:</div><div style="display:grid;gap:5px;margin:9px 0;">${[['5','👀','things you can SEE','#60a5fa'],['4','✋','things you can TOUCH','#a78bfa'],['3','👂','things you can HEAR','#34d399'],['2','👃','things you can SMELL','#fcd34d'],['1','👅','thing you can TASTE','#fb923c']].map(([n,e,t,c])=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:10px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.07);"><span style="font-family:'Fredoka One',cursive;font-size:.95rem;color:${c};width:18px;">${n}</span><span style="font-size:1.15rem;">${e}</span><span style="font-weight:700;font-size:.8rem;">${t}</span></div>`).join('')}</div>`},{cat:"Match the best coping tool to each situation!",html:`<div class="sec-title">🎯 Pick the Best Tool</div><div style="display:grid;gap:8px;margin-top:8px;">${[{s:'You feel so angry you want to explode',opts:['🦵 Walk It Out','🎮 Take a Break'],c:0},{s:'Panicking and heart is racing',opts:['🌬️ Deep Breathing','✏️ Draw It Out'],c:0},{s:'Sad and want to feel heard',opts:['🧊 Cool Water','🗣️ Talk to Someone'],c:1}].map(({s,opts,c},i)=>`<div style="background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.07);border-radius:12px;padding:11px;"><div style="font-weight:700;font-size:.81rem;margin-bottom:6px;">📍 ${s}</div><div style="display:flex;gap:5px;">${opts.map((o,j)=>`<button onclick="matchCoping(this,${j},${c})" style="flex:1;padding:6px;border:1.5px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.05);font-family:'Nunito',sans-serif;font-weight:700;font-size:.76rem;color:var(--txt);cursor:pointer;transition:all .2s;">${o}</button>`).join('')}</div></div>`).join('')}</div>`},{cat:"Quiz time! 🧰⭐",html:`<div class="sec-title">⭐ You've learned:</div><div class="l-text">✅ Different tools for different feelings<br>✅ Deep breathing calms fast<br>✅ 5-4-3-2-1 grounds you now<br>✅ You have many options!</div><div class="hl">🎯 Quiz time!</div>`}];}
+function braveSteps(){return[{cat:"Final mission — Brave Adventures! All skills come together here!",html:`<div class="sec-title">🏔️ The Worry Ladder</div><div class="l-text">Instead of avoiding worries, face them step by step. Start <strong>easy</strong>, work up. Each win builds confidence!</div><div class="fear-steps">${[['5','Hardest — top of ladder!','#f87171'],['4','Big challenge','#fb923c'],['3','Medium challenge','#fbbf24'],['2','A little harder','#fde68a'],['1','Easiest — tiny first step','#86efac']].map(([n,l,c])=>`<div class="fear-row"><div class="fear-letter" style="background:${c};">${n}</div><div><div class="fear-t">${l}</div></div></div>`).join('')}</div><div class="hl">🔑 Each step makes you braver for the next!</div>`},{cat:"Build YOUR Brave Ladder!",html:`<div class="sec-title">🏗️ Your Brave Ladder</div><div id="binputs" style="display:grid;gap:6px;">${[['1','#86efac','Tiny first step — really easy'],['2','#fde68a','A little harder'],['3','#fbbf24','Medium challenge'],['4','#fb923c','Big challenge'],['5','#f87171','Hardest — top of ladder!']].map(([n,c,p])=>`<div style="display:flex;align-items:center;gap:8px;"><div style="width:25px;height:25px;border-radius:50%;background:${c};color:white;font-family:'Fredoka One',cursive;font-size:.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${n}</div><input class="g-inp" style="margin:0;flex:1;" placeholder="${p}"></div>`).join('')}</div><div id="bfb2" class="ifb" style="min-height:14px;margin-top:5px;margin-bottom:6px;"></div><button class="btn btn-gold btn-sm" onclick="braveCheck()">🦸 Ready!</button>`},{cat:"You always deserve a reward for being brave!",html:`<div class="sec-title">🎁 Reward Your Bravery!</div><div class="l-text">Trying is always worth celebrating!</div><div class="tools-grid">${[['⭐','Say "I did it!"'],['🍦','Have a treat'],['🎮','Play a game'],['🤗','Tell a grown-up'],['✏️','Write it down'],['💃','Happy dance!']].map(([e,t])=>`<div class="tool-btn" onclick="this.classList.toggle('picked')"><span class="tool-e">${e}</span>${t}</div>`).join('')}</div><div class="hl">🏆 Brave = doing it ANYWAY.</div>`},{cat:"You're a TOTAL Coping Cat champion! Final quiz! 🦸⭐",html:`<div class="sec-title">⭐ You've learned:</div><div class="l-text">✅ Worry Ladder = step by step<br>✅ Start with the easiest<br>✅ Brave = doing it even when scared<br>✅ Always reward your bravery!</div><div class="hl">🎯 Final quiz!</div>`}];}
+
+function feelQuiz(){return[{q:"Best first step when you have a big feeling?",opts:["Ignore it","Notice it and name it","Get angry at yourself","Tell no one"],c:1,fb:"✅ Noticing and naming is step #1!"},{q:"Sam's heart is racing before his recital. He's most likely...",opts:["Bored","Tired","Nervous or Excited","Angry"],c:2,fb:"✅ Fast heart + big moment = nervous or excited!"},{q:"Feelings are...",opts:["Only for little kids","Bad and should be stopped","A sign something is wrong","Normal and okay to have"],c:3,fb:"✅ All feelings are normal!"},{q:"The feelings thermometer shows...",opts:["The weather","What time it is","How BIG a feeling is","How to make friends"],c:2,fb:"✅ The thermometer shows the SIZE of a feeling!"}];}
+function bodyQuiz(){return[{q:"Why does your heart beat faster when scared?",opts:["Your body is broken","Your body is protecting you","You ran too fast","You ate too much"],c:1,fb:"✅ Fight-or-flight keeps you safe!"},{q:"Which is a body clue for worry?",opts:["Feeling sleepy after lunch","Butterflies in your tummy","Being really hungry","Having a great dream"],c:1,fb:"✅ Butterflies = classic worry body clue!"},{q:"In belly breathing, your belly should...",opts:["Stay still","Go in when you breathe in","Go out when you breathe in","Move super fast"],c:2,fb:"✅ Belly goes OUT when you breathe in!"},{q:"Belly breathing is good for...",opts:["Running faster","Calming your body down","Falling asleep","Remembering things"],c:1,fb:"✅ Belly breathing activates your calm-down system!"}];}
+function thoughtQuiz(){return[{q:"Which is a HELPFUL thought?",opts:['"I always mess up"','"Nobody likes me"','"I can try my best"','"Something terrible will happen"'],c:2,fb:"✅ 'I can try my best' is realistic and encouraging!"},{q:"What should you ask about a tricky thought?",opts:['"Am I the worst?"','"Is this 100% true?"','"Should I give up?"','"Will anyone notice?"'],c:1,fb:"✅ 'Is this 100% true?' is the key question!"},{q:"Unhelpful thoughts make worries feel...",opts:["Smaller","The same","Bigger and scarier","Go away"],c:2,fb:"✅ Unhelpful thoughts amplify worries!"},{q:"Best way to handle a tricky thought?",opts:["Believe it","Never think","Replace it with a helpful thought","Shout at it"],c:2,fb:"✅ Replacing tricky thoughts is the key skill!"}];}
+function fearQuiz(){return[{q:"What does F in FEAR stand for?",opts:["Finding friends","Feeling frightened","Finishing fast","Fighting fear"],c:1,fb:"✅ F = Feeling frightened!"},{q:"E in FEAR stands for...",opts:["Everything is fine","Exercising helps","Expecting bad things","Eating well"],c:2,fb:"✅ E = Expecting bad things!"},{q:"A in FEAR means...",opts:["Always run away","Ask for the answer","Attitudes & actions that help","Adding more worries"],c:2,fb:"✅ A = Attitudes & Actions that help!"},{q:"After something brave, R says...",opts:["Forget it","Feel embarrassed","Worry about next time","Reward yourself!"],c:3,fb:"✅ R = Results & Rewards! Always celebrate!"}];}
+function copingQuiz(){return[{q:"Fastest way to calm your body when panicking?",opts:["Watch TV","Deep breathing","Eat sugar","Run fast"],c:1,fb:"✅ Deep breathing is one of the fastest calm-down tools!"},{q:"5-4-3-2-1 uses...",opts:["Your imagination","Your five senses to focus on now","A phone app","A special food"],c:1,fb:"✅ 5-4-3-2-1 uses your senses to return to the present!"},{q:"Why do we have different coping tools?",opts:["To confuse ourselves","One tool works for everything","Different feelings need different tools","Too hard to remember"],c:2,fb:"✅ Different tools solve different problems!"},{q:"A good coping tool for anger is...",opts:["Yelling at a friend","Throwing something","Walking it out or deep breathing","Pretending you're not angry"],c:2,fb:"✅ Moving your body and breathing release angry energy!"}];}
+function braveQuiz(){return[{q:"What is a Worry Ladder?",opts:["A tool to climb trees","Steps from easiest to hardest to face a worry","A list of all your fears","Climbing equipment"],c:1,fb:"✅ A Worry Ladder breaks a big worry into small steps!"},{q:"When using a Worry Ladder, start with...",opts:["The hardest step","The middle step","The easiest step first","Whichever you feel like"],c:2,fb:"✅ Always start EASY. Each success builds confidence!"},{q:"Being brave means...",opts:["Never feeling scared","Doing something even when nervous","Being bigger than everyone","Never needing help"],c:1,fb:"✅ Brave = doing it EVEN when scared!"},{q:"After doing something brave...",opts:["Worry it wasn't good enough","Forget about it","Only do it if you were perfect","Reward yourself and feel proud!"],c:3,fb:"✅ Always celebrate your bravery!"}];}
+</script>
+</body>
+</html>

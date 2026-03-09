@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Let's Talk Trouble</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
+<style>
+:root {
+  --navy: #1a3a6b;
+  --blue-mid: #2255a4;
+  --p1: #ef4444;
+  --p2: #3b82f6;
+  --gold: #f59e0b;
+  --green: #22c55e;
+  --card-bg: rgba(255,255,255,0.96);
+  --text: #1e293b;
+  --text-mid: #64748b;
+  --anxiety: #ef4444;
+  --impulsivity: #f59e0b;
+  --depression: #3b82f6;
+  --social: #22c55e;
+  --radius: 16px;
+  --shadow: 0 8px 32px rgba(15,35,71,0.18);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(160deg, #c7deff 0%, #e8f4ff 50%, #d4edff 100%);
+  min-height: 100vh;
+  color: var(--text);
+}
+#page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 18px 14px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Header */
+.hdr { text-align: center; }
+.hdr-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(2rem,5vw,3rem);
+  color: #fff;
+  text-shadow: 0 3px 12px rgba(15,35,71,0.35);
+  letter-spacing: 1px;
+}
+.hdr-title span { color: var(--gold); }
+.hdr-sub { font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.82); margin-top: 2px; }
+
+/* Generic card */
+.card {
+  width: 100%;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  box-shadow: var(--shadow);
+}
+
+/* Share */
+.share-label { font-size: 0.82rem; font-weight: 800; color: var(--text-mid); margin-bottom: 8px; }
+.share-row { display: flex; gap: 10px; align-items: center; }
+.share-url {
+  flex: 1; font-size: 0.78rem; font-weight: 600; color: var(--text);
+  background: #eff6ff; border: 1.5px solid #c7deff; border-radius: 10px;
+  padding: 8px 12px; word-break: break-all; font-family: monospace;
+  min-height: 38px; display: flex; align-items: center; user-select: all;
+}
+.copy-btn {
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.85rem;
+  padding: 8px 18px; border: none; border-radius: 10px;
+  background: var(--navy); color: white; cursor: pointer;
+  white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: transform 0.12s, background 0.15s; flex-shrink: 0;
+}
+.copy-btn:hover { transform: scale(1.04); background: var(--blue-mid); }
+.copy-btn.copied { background: var(--green); }
+.conn-row { margin-top: 8px; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; gap: 6px; color: var(--text-mid); }
+.dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+.dot.orange { background: #f59e0b; box-shadow: 0 0 5px #f59e0b; }
+.dot.green  { background: var(--green); box-shadow: 0 0 5px var(--green); }
+.dot.red    { background: var(--p1); box-shadow: 0 0 5px var(--p1); }
+
+/* Category section */
+.section-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  color: var(--navy);
+  margin-bottom: 10px;
+}
+.cats { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Category pills — explicit styling so text always shows */
+.cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.84rem;
+  padding: 6px 16px;
+  border-radius: 50px;
+  border-width: 2.5px;
+  border-style: solid;
+  cursor: pointer;
+  background: #ffffff;
+  transition: transform 0.15s, background 0.15s, color 0.15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  line-height: 1;
+}
+.cat-pill:hover { transform: translateY(-2px); }
+
+/* Each category: inactive = white bg + colored border + colored text */
+.cat-pill[data-cat="anxiety"]     { border-color: #ef4444; color: #ef4444; }
+.cat-pill[data-cat="impulsivity"] { border-color: #f59e0b; color: #f59e0b; }
+.cat-pill[data-cat="depression"]  { border-color: #3b82f6; color: #3b82f6; }
+.cat-pill[data-cat="social"]      { border-color: #22c55e; color: #22c55e; }
+
+/* Active = filled bg + white text */
+.cat-pill.active[data-cat="anxiety"]     { background: #ef4444; color: #ffffff; }
+.cat-pill.active[data-cat="impulsivity"] { background: #f59e0b; color: #ffffff; }
+.cat-pill.active[data-cat="depression"]  { background: #3b82f6; color: #ffffff; }
+.cat-pill.active[data-cat="social"]      { background: #22c55e; color: #ffffff; }
+
+/* Players */
+.players-row { display: flex; gap: 12px; width: 100%; flex-wrap: wrap; }
+.player-card {
+  flex: 1; min-width: 180px; background: var(--card-bg);
+  border-radius: var(--radius); padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: var(--shadow); border: 3px solid transparent;
+  transition: border-color 0.25s, transform 0.2s; position: relative;
+}
+.player-card.active-turn { border-color: var(--gold); transform: translateY(-2px); }
+.player-chip {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+.player-chip.p1 { background: radial-gradient(circle at 35% 35%, #f87171, #ef4444); }
+.player-chip.p2 { background: radial-gradient(circle at 35% 35%, #93c5fd, #3b82f6); }
+.player-info { flex: 1; }
+.player-label { font-size: 0.7rem; font-weight: 800; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.8px; }
+.player-name-input {
+  font-family: 'Fredoka One', cursive; font-size: 1.15rem; color: var(--text);
+  border: none; background: transparent; outline: none; width: 100%;
+}
+.player-pos { font-size: 0.75rem; font-weight: 700; color: var(--text-mid); }
+.you-badge {
+  position: absolute; top: -9px; right: 10px;
+  background: var(--gold); color: white;
+  font-size: 0.68rem; font-weight: 800; padding: 2px 8px;
+  border-radius: 50px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+/* Status */
+.status-bar {
+  width: 100%; background: var(--card-bg); border-radius: var(--radius);
+  padding: 10px 20px; text-align: center;
+  font-family: 'Fredoka One', cursive; font-size: 1.05rem; color: var(--navy);
+  box-shadow: var(--shadow); min-height: 44px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Game area */
+.game-area { display: flex; gap: 14px; width: 100%; align-items: flex-start; flex-wrap: wrap; }
+
+/* Board */
+.board-outer {
+  flex: 1 1 420px; background: var(--navy);
+  border-radius: 22px; padding: 14px;
+  box-shadow: 0 12px 48px rgba(15,35,71,0.4);
+  position: relative; min-width: 300px;
+}
+.board-title { text-align: center; margin-bottom: 10px; }
+.board-title-main { font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: #fff; }
+.board-title-sub { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: var(--gold); }
+.board-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  gap: 5px; aspect-ratio: 1; position: relative;
+}
+.sq {
+  background: rgba(255,255,255,0.12); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; min-height: 34px;
+  border: 2px solid rgba(255,255,255,0.05);
+}
+.sq.start-sq  { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.4); }
+.sq.finish-sq { background: rgba(34,197,94,0.3);   border-color: rgba(34,197,94,0.6); }
+.sq.inner     { background: transparent; border: none; }
+.sq-num { position: absolute; top: 2px; left: 4px; font-family: 'Fredoka One', cursive; font-size: 0.5rem; color: rgba(255,255,255,0.45); }
+.piece {
+  position: absolute; width: 16px; height: 16px; border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4); top: 50%; transform: translateY(-50%);
+  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.piece.p1 { background: radial-gradient(circle at 35% 35%, #f87171, #ef4444); left: 10%; }
+.piece.p2 { background: radial-gradient(circle at 35% 35%, #93c5fd, #3b82f6); left: 52%; }
+
+/* Center overlay */
+.center-area {
+  position: absolute;
+  top: calc(14.28% + 5px); left: calc(14.28% + 5px);
+  width: calc(71.44% - 10px); height: calc(71.44% - 10px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 7px;
+  background: rgba(255,255,255,0.05); border-radius: 12px;
+}
+.home-label { font-family:'Fredoka One',cursive; font-size:0.75rem; color:rgba(255,255,255,0.5); letter-spacing:1px; }
+.home-pieces { display:flex; gap:10px; }
+.home-piece { width:28px; height:28px; border-radius:50%; box-shadow:0 3px 10px rgba(0,0,0,0.3); transition: opacity 0.3s; }
+.home-piece.p1 { background: radial-gradient(circle at 35% 35%, #f87171, #ef4444); }
+.home-piece.p2 { background: radial-gradient(circle at 35% 35%, #93c5fd, #3b82f6); }
+.home-piece.gone { opacity: 0.2; }
+.dice-btn {
+  background: white; border: none; border-radius: 12px;
+  width: 56px; height: 56px; font-size: 2rem; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  transition: transform 0.15s; display: flex; align-items: center; justify-content: center;
+}
+.dice-btn:hover:not(:disabled) { transform: scale(1.1) rotate(-5deg); }
+.dice-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.ctr-label { font-family:'Fredoka One',cursive; font-size:0.72rem; color:rgba(255,255,255,0.55); letter-spacing:1px; }
+@keyframes spin-dice {
+  0%{transform:rotate(0) scale(1)} 50%{transform:rotate(180deg) scale(1.3)} 100%{transform:rotate(360deg) scale(1)}
+}
+.dice-rolling { animation: spin-dice 0.5s ease-in-out; }
+
+/* Side panel */
+.side-panel { flex: 0 0 220px; display: flex; flex-direction: column; gap: 12px; min-width: 200px; }
+.how-title { font-family:'Fredoka One',cursive; font-size:1rem; color:var(--navy); margin-bottom:10px; }
+.how-item { font-size:0.82rem; font-weight:600; color:var(--text-mid); padding:4px 0; display:flex; align-items:flex-start; gap:6px; line-height:1.4; }
+
+/* Question card */
+.q-card { display: none; }
+.q-card.visible { display: block; }
+.q-cat-badge {
+  font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.8px;
+  padding:3px 10px; border-radius:50px; color:white; display:inline-block; margin-bottom:8px;
+}
+.q-text { font-size:0.92rem; font-weight:700; color:var(--text); line-height:1.5; margin-bottom:10px; }
+.q-dismiss {
+  font-family:'Nunito',sans-serif; font-weight:800; font-size:0.8rem; padding:6px 14px;
+  border:none; border-radius:50px; cursor:pointer; background:var(--navy); color:white;
+  box-shadow:0 2px 8px rgba(0,0,0,0.12); transition:transform 0.12s;
+}
+.q-dismiss:hover { transform:scale(1.05); }
+
+/* Buttons */
+.bottom-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; width:100%; }
+.btn {
+  font-family:'Nunito',sans-serif; font-weight:800; font-size:0.9rem;
+  padding:10px 22px; border:none; border-radius:50px; cursor:pointer;
+  box-shadow:0 3px 10px rgba(0,0,0,0.13); transition:transform 0.12s, box-shadow 0.12s;
+  display:flex; align-items:center; gap:6px;
+}
+.btn:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,0.17); }
+.btn-navy { background:var(--navy); color:white; }
+.btn-soft { background:rgba(255,255,255,0.9); color:var(--text); }
+
+/* Win overlay */
+#win-overlay {
+  display:none; position:fixed; inset:0; z-index:200;
+  background:rgba(15,35,71,0.6); backdrop-filter:blur(5px);
+  align-items:center; justify-content:center;
+}
+#win-overlay.show { display:flex; }
+.win-card {
+  background:white; border-radius:28px; padding:40px; text-align:center;
+  box-shadow:0 24px 80px rgba(0,0,0,0.35);
+  animation:pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+  max-width:360px; width:90%;
+}
+@keyframes pop { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+.win-emoji { font-size:4rem; margin-bottom:6px; }
+.win-name { font-family:'Fredoka One',cursive; font-size:2rem; line-height:1.1; margin-bottom:4px; }
+.win-name.p1 { color:#ef4444; }
+.win-name.p2 { color:#3b82f6; }
+.win-sub { font-size:0.95rem; font-weight:600; color:var(--text-mid); margin-bottom:20px; }
+
+.confetti-p {
+  position:fixed; pointer-events:none; z-index:300; border-radius:3px;
+  animation:cffall linear forwards;
+}
+@keyframes cffall { 0%{transform:translateY(-10px) rotate(0);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
+
+.footer { font-size:0.72rem; font-weight:700; color:rgba(255,255,255,0.65); text-align:center; padding-bottom:4px; }
+
+@media(max-width:620px) {
+  .side-panel { flex:1 1 100%; flex-direction:row; flex-wrap:wrap; }
+  .sq { min-height:26px; }
+}
+</style>
+</head>
+<body>
+<div id="page">
+
+  <div class="hdr">
+    <div class="hdr-title">Let's Talk <span>Trouble</span> 🎲</div>
+    <div class="hdr-sub">Playful Strategies for Real Life Challenges</div>
+  </div>
+
+  <!-- Share -->
+  <div class="card">
+    <div class="share-label">🔗 Share this link with your player:</div>
+    <div class="share-row">
+      <div class="share-url" id="shareUrl">Generating link...</div>
+      <button class="copy-btn" id="copyBtn" onclick="copyLink()">📋 Copy</button>
+    </div>
+    <div class="conn-row">
+      <span class="dot orange" id="connDot"></span>
+      <span id="connText">Connecting...</span>
+    </div>
+  </div>
+
+  <!-- Question Category -->
+  <div class="card">
+    <div class="section-title">🏷️ Question Category</div>
+    <div class="cats">
+      <button class="cat-pill active" data-cat="anxiety"     onclick="toggleCat(this)">😰 Anxiety</button>
+      <button class="cat-pill active" data-cat="impulsivity" onclick="toggleCat(this)">⚡ Impulsivity</button>
+      <button class="cat-pill active" data-cat="depression"  onclick="toggleCat(this)">💙 Depression</button>
+      <button class="cat-pill active" data-cat="social"      onclick="toggleCat(this)">🌟 Social Skills</button>
+    </div>
+  </div>
+
+  <!-- Players -->
+  <div class="players-row">
+    <div class="player-card" id="p1Card">
+      <div class="you-badge" id="p1YouBadge">YOU</div>
+      <div class="player-chip p1"></div>
+      <div class="player-info">
+        <div class="player-label">Player 1</div>
+        <input class="player-name-input" id="p1Name" value="Michelle" maxlength="14" oninput="onNameChange()">
+        <div class="player-pos" id="p1Pos">At Home</div>
+      </div>
+    </div>
+    <div class="player-card" id="p2Card">
+      <div class="you-badge" id="p2YouBadge" style="display:none">YOU</div>
+      <div class="player-chip p2"></div>
+      <div class="player-info">
+        <div class="player-label">Player 2</div>
+        <input class="player-name-input" id="p2Name" value="Waiting..." maxlength="14" oninput="onNameChange()">
+        <div class="player-pos" id="p2Pos">At Home</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar" id="statusBar">⏳ Waiting for Player 2 to join...</div>
+
+  <!-- Game area -->
+  <div class="game-area">
+    <div class="board-outer">
+      <div class="board-title">
+        <div class="board-title-main">Let's Talk</div>
+        <div class="board-title-sub">Trouble 🎲</div>
+      </div>
+      <div class="board-grid" id="boardGrid"></div>
+    </div>
+
+    <div class="side-panel">
+      <div class="card">
+        <div class="how-title">🎯 How to Play</div>
+        <div class="how-item">🎲 Click <strong>Pop!</strong> to roll</div>
+        <div class="how-item">🔴🔵 Move your piece forward</div>
+        <div class="how-item">💬 Answer a question</div>
+        <div class="how-item">🏆 First to lap the board wins!</div>
+        <div class="how-item">💥 Land on opponent = send them home!</div>
+      </div>
+      <div class="card q-card" id="qCard">
+        <div class="q-cat-badge" id="qBadge"></div>
+        <div class="q-text" id="qText"></div>
+        <button class="q-dismiss" onclick="dismissQuestion()">Got it! ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="bottom-row">
+    <button class="btn btn-navy" id="startBtn" onclick="hostStartGame()">🎮 Start Game</button>
+    <button class="btn btn-soft" onclick="hostNewGame()">🔄 New Game</button>
+  </div>
+
+  <div class="footer">© Michelle S. Coleman LPC PLLC — All Rights Reserved</div>
+</div>
+
+<!-- Win overlay -->
+<div id="win-overlay">
+  <div class="win-card">
+    <div class="win-emoji">🏆</div>
+    <div class="win-name" id="winName"></div>
+    <div class="win-sub">Lapped the board! Incredible! 🎉</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-navy" onclick="hostNewGame();closeWin()">Play Again!</button>
+      <button class="btn btn-soft" onclick="closeWin()">Keep Talking</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Questions ──────────────────────────────────────────────────
+const QUESTIONS = {
+  anxiety:[
+    "What's one thing that makes you feel nervous or worried? What helps you feel better?",
+    "If worry was a weather forecast, what would it look like today — sunny, cloudy, or stormy?",
+    "Name three things you can see right now. How does noticing them make you feel?",
+    "What's a brave thing you've done even when you were scared?",
+    "What's your favorite way to calm down when you feel anxious?",
+    "If your anxiety had a shape or color, what would it be?",
+    "Who do you talk to when you're feeling really worried?",
+    "What's something you were nervous about that turned out okay?"
+  ],
+  impulsivity:[
+    "Tell about a time you acted too quickly. What would you do differently?",
+    "What's your brain's 'pause button'? What helps you stop and think?",
+    "Name something you did impulsively that you're glad you did!",
+    "If you could slow down one moment from your week, which one would it be?",
+    "What's one strategy you use before making a big decision?",
+    "Describe a time you waited patiently. How did it feel?",
+    "What does it feel like in your body when you want to act impulsively?",
+    "If you had a remote control for your impulses, what buttons would it have?"
+  ],
+  depression:[
+    "What's one small thing that made you smile this week — even a tiny bit?",
+    "Who is someone who always makes you feel a little better?",
+    "What's your favorite comfort — a food, a show, a place, or a person?",
+    "If you could design your perfect 'feel-better' day, what would it look like?",
+    "What's something kind you could say to yourself right now?",
+    "What's a hobby or activity that used to bring you joy?",
+    "Name one thing you're looking forward to — even if it's small.",
+    "What does 'a good day' look like for you?"
+  ],
+  social:[
+    "What makes someone a good friend? Do you have those qualities?",
+    "Tell about a time you helped someone. How did it make you feel?",
+    "What's something hard about making new friends? What's something fun about it?",
+    "If you had to teach someone one social skill, what would it be?",
+    "Describe a time you disagreed with a friend. How did you handle it?",
+    "What's one thing you wish people understood better about you?",
+    "How do you show someone that you care about them?",
+    "What's the kindest thing a friend has ever done for you?"
+  ]
+};
+
+// ── Board track ────────────────────────────────────────────────
+function buildTrack() {
+  const t=[];
+  for(let c=0;c<7;c++) t.push({row:0,col:c});
+  for(let r=1;r<6;r++) t.push({row:r,col:6});
+  for(let c=6;c>=0;c--) t.push({row:6,col:c});
+  for(let r=5;r>=1;r--) t.push({row:r,col:0});
+  t.forEach((s,i)=>s.num=i+1);
+  return t;
+}
+const TRACK=buildTrack(), TOTAL=TRACK.length;
+const DICE_FACES=['⚀','⚁','⚂','⚃','⚄','⚅'];
+
+function initBoardDOM(){
+  const grid=document.getElementById('boardGrid');
+  grid.innerHTML='';
+  for(let r=0;r<7;r++){
+    for(let c=0;c<7;c++){
+      const d=document.createElement('div');
+      d.id=`cell-${r}-${c}`;
+      const edge=r===0||r===6||c===0||c===6;
+      d.className=edge?'sq':'sq inner';
+      grid.appendChild(d);
+    }
+  }
+  TRACK.forEach(t=>{
+    const cell=document.getElementById(`cell-${t.row}-${t.col}`);
+    if(t.num===1) cell.classList.add('start-sq');
+    if(t.num===TOTAL) cell.classList.add('finish-sq');
+    const n=document.createElement('span');
+    n.className='sq-num';
+    n.textContent=t.num===1?'★':t.num===TOTAL?'🏁':t.num;
+    cell.appendChild(n);
+  });
+  // Center
+  const ca=document.createElement('div');
+  ca.className='center-area';
+  ca.innerHTML=`
+    <div class="home-label">🏠 HOME</div>
+    <div class="home-pieces">
+      <div class="home-piece p1" id="hp1"></div>
+      <div class="home-piece p2" id="hp2"></div>
+    </div>
+    <div class="ctr-label">Click to roll ↓</div>
+    <button class="dice-btn" id="diceBtn" onclick="onRollClick()" disabled>🎲</button>
+    <div class="ctr-label" id="diceResult" style="min-height:16px"></div>
+    <div class="ctr-label" style="color:rgba(34,197,94,0.85)">🏆 FINISH</div>
+  `;
+  grid.appendChild(ca);
+}
+
+function renderPieces(){
+  document.querySelectorAll('.piece').forEach(e=>e.remove());
+  for(let p=0;p<2;p++){
+    if(!STATE.onBoard[p]) continue;
+    const idx=STATE.positions[p]-1;
+    if(idx<0||idx>=TOTAL) continue;
+    const t=TRACK[idx];
+    const cell=document.getElementById(`cell-${t.row}-${t.col}`);
+    const piece=document.createElement('div');
+    piece.className=`piece p${p+1}`;
+    cell.appendChild(piece);
+  }
+  for(let p=0;p<2;p++){
+    const hp=document.getElementById(`hp${p+1}`);
+    if(hp) hp.classList.toggle('gone',STATE.onBoard[p]);
+  }
+  document.getElementById('p1Pos').textContent=STATE.onBoard[0]?`Square ${STATE.positions[0]}`:'At Home';
+  document.getElementById('p2Pos').textContent=STATE.onBoard[1]?`Square ${STATE.positions[1]}`:'At Home';
+}
+
+// ── Game state ────────────────────────────────────────────────
+let STATE={
+  started:false, currentPlayer:1,
+  positions:[0,0], onBoard:[false,false], laps:[0,0],
+  pendingQ:false, activeCats:['anxiety','impulsivity','depression','social']
+};
+
+// ── Multiplayer ───────────────────────────────────────────────
+let peer=null, conn=null, isHost=false, myPlayer=1;
+
+function genCode(){
+  const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s=''; for(let i=0;i<6;i++) s+=c[Math.floor(Math.random()*c.length)];
+  return s;
+}
+
+function initNetwork(){
+  const params=new URLSearchParams(window.location.search);
+  const gameCode=params.get('game');
+
+  if(!gameCode){
+    // HOST
+    isHost=true; myPlayer=1;
+    const code=genCode();
+    const url=window.location.href.split('?')[0]+'?game='+code;
+    document.getElementById('shareUrl').textContent=url;
+    setConn('orange','Waiting for Player 2 to join...');
+    document.getElementById('p1YouBadge').style.display='';
+    document.getElementById('p2YouBadge').style.display='none';
+
+    peer=new Peer('ltt-'+code,{debug:0});
+    peer.on('open',()=>setConn('orange','Ready! Share the link above.'));
+    peer.on('connection',c=>{
+      conn=c; setupConn();
+      setConn('green','✅ Player 2 connected!');
+      setStatus('🎮 Both connected! Host can press Start Game.');
+      send({type:'name',player:1,name:p1Name()});
+    });
+    peer.on('error',e=>setConn('red','Network error: '+e.type));
+  } else {
+    // GUEST
+    isHost=false; myPlayer=2;
+    const url=window.location.href.split('?')[0]+'?game='+gameCode;
+    document.getElementById('shareUrl').textContent=url;
+    document.getElementById('p1YouBadge').style.display='none';
+    document.getElementById('p2YouBadge').style.display='';
+    document.getElementById('startBtn').style.display='none';
+    setConn('orange','Connecting to host...');
+
+    peer=new Peer({debug:0});
+    peer.on('open',()=>{
+      conn=peer.connect('ltt-'+gameCode,{reliable:true});
+      setupConn();
+    });
+    peer.on('error',()=>setConn('red','Could not connect. Check the link and try again.'));
+  }
+}
+
+function setupConn(){
+  conn.on('open',()=>{
+    if(!isHost){
+      setConn('green','✅ Connected to host!');
+      setStatus('✅ Connected! Waiting for host to start...');
+      send({type:'name',player:2,name:p2Name()});
+    }
+  });
+  conn.on('data',handleMsg);
+  conn.on('close',()=>setConn('red','Player disconnected.'));
+  conn.on('error',()=>setConn('red','Connection error.'));
+}
+
+function send(msg){ if(conn&&conn.open){ try{conn.send(msg);}catch(e){} } }
+
+function handleMsg(msg){
+  switch(msg.type){
+    case 'name':
+      document.getElementById(`p${msg.player}Name`).value=msg.name;
+      break;
+    case 'state':
+      STATE=msg.state;
+      renderPieces(); updateTurnUI();
+      break;
+    case 'question':
+      showQ(msg.cat,msg.q);
+      break;
+    case 'dismissQ':
+      hideQ();
+      break;
+    case 'win':
+      showWin(msg.player);
+      break;
+    case 'status':
+      setStatus(msg.text);
+      break;
+    case 'newgame':
+      applyNewGame();
+      break;
+  }
+}
+
+function broadcast(msg){ send(msg); }
+
+// ── Game logic ────────────────────────────────────────────────
+function hostStartGame(){
+  if(!isHost) return;
+  STATE={started:true,currentPlayer:1,positions:[0,0],onBoard:[false,false],laps:[0,0],pendingQ:false,activeCats:STATE.activeCats};
+  broadcast({type:'state',state:STATE});
+  renderPieces(); updateTurnUI();
+  document.getElementById('startBtn').style.display='none';
+  const msg=`${p1Name()}'s turn — click Pop! to roll 🎲`;
+  setStatus(msg); broadcast({type:'status',text:msg});
+}
+
+function hostNewGame(){
+  STATE.started=false; STATE.positions=[0,0]; STATE.onBoard=[false,false];
+  STATE.laps=[0,0]; STATE.currentPlayer=1; STATE.pendingQ=false;
+  broadcast({type:'newgame'});
+  applyNewGame();
+}
+
+function applyNewGame(){
+  renderPieces();
+  hideQ();
+  document.getElementById('startBtn').style.display='';
+  const db=document.getElementById('diceBtn');
+  if(db){db.innerHTML='🎲';db.disabled=true;}
+  document.getElementById('p1Card').classList.remove('active-turn');
+  document.getElementById('p2Card').classList.remove('active-turn');
+  setStatus('⏳ Host press Start Game to begin');
+}
+
+function onRollClick(){
+  if(!STATE.started||STATE.pendingQ) return;
+  if(STATE.currentPlayer!==myPlayer) return;
+  const db=document.getElementById('diceBtn');
+  if(db){db.disabled=true;db.classList.add('dice-rolling');}
+  const roll=Math.floor(Math.random()*6)+1;
+  setTimeout(()=>{
+    if(db){db.innerHTML=DICE_FACES[roll-1];db.classList.remove('dice-rolling');}
+    const re=document.getElementById('diceResult');
+    if(re) re.textContent='Rolled: '+roll;
+    doMove(roll);
+  },550);
+}
+
+function doMove(roll){
+  const p=STATE.currentPlayer-1, other=1-p;
+  const names=[p1Name(),p2Name()];
+  if(!STATE.onBoard[p]){
+    STATE.positions[p]=1; STATE.onBoard[p]=true;
+    STATE.positions[p]=advance(p,roll-1);
+  } else {
+    STATE.positions[p]=advance(p,roll);
+  }
+  if(STATE.laps[p]>=1){
+    broadcast({type:'state',state:STATE});
+    broadcast({type:'win',player:STATE.currentPlayer});
+    renderPieces(); updateTurnUI();
+    setTimeout(()=>showWin(STATE.currentPlayer),300);
+    return;
+  }
+  let bump=false;
+  if(STATE.onBoard[other]&&STATE.positions[p]===STATE.positions[other]&&STATE.laps[p]===STATE.laps[other]){
+    STATE.onBoard[other]=false; STATE.positions[other]=0; STATE.laps[other]=0; bump=true;
+  }
+  STATE.pendingQ=true;
+  broadcast({type:'state',state:STATE});
+  renderPieces(); updateTurnUI();
+  const msg=bump
+    ?`💥 ${names[p]} bumped ${names[other]} home! Answer a question...`
+    :`${names[p]} moved to square ${STATE.positions[p]}! Answer a question...`;
+  setStatus(msg); broadcast({type:'status',text:msg});
+  const cats=STATE.activeCats.filter(c=>QUESTIONS[c]&&QUESTIONS[c].length);
+  if(!cats.length){endTurn();return;}
+  const cat=cats[Math.floor(Math.random()*cats.length)];
+  const q=QUESTIONS[cat][Math.floor(Math.random()*QUESTIONS[cat].length)];
+  showQ(cat,q);
+  broadcast({type:'question',cat,q});
+}
+
+function advance(p,steps){
+  let pos=STATE.positions[p];
+  for(let i=0;i<steps;i++){pos++;if(pos>TOTAL){pos=1;STATE.laps[p]++;}}
+  return pos;
+}
+
+function dismissQuestion(){
+  hideQ();
+  broadcast({type:'dismissQ'});
+  endTurn();
+}
+
+function endTurn(){
+  STATE.pendingQ=false;
+  STATE.currentPlayer=STATE.currentPlayer===1?2:1;
+  broadcast({type:'state',state:STATE});
+  renderPieces(); updateTurnUI();
+  const db=document.getElementById('diceBtn');
+  if(db){db.innerHTML='🎲';db.disabled=STATE.currentPlayer!==myPlayer;}
+}
+
+function showQ(cat,q){
+  const colors={anxiety:'#ef4444',impulsivity:'#f59e0b',depression:'#3b82f6',social:'#22c55e'};
+  document.getElementById('qBadge').textContent=cat.charAt(0).toUpperCase()+cat.slice(1);
+  document.getElementById('qBadge').style.background=colors[cat];
+  document.getElementById('qText').textContent=q;
+  document.getElementById('qCard').classList.add('visible');
+}
+function hideQ(){ document.getElementById('qCard').classList.remove('visible'); }
+
+function showWin(player){
+  const name=player===1?p1Name():p2Name();
+  document.getElementById('winName').textContent=name+' Wins! 🏆';
+  document.getElementById('winName').className='win-name p'+player;
+  document.getElementById('win-overlay').classList.add('show');
+  spawnConfetti();
+}
+function closeWin(){ document.getElementById('win-overlay').classList.remove('show'); }
+
+// ── UI helpers ────────────────────────────────────────────────
+function updateTurnUI(){
+  document.getElementById('p1Card').classList.toggle('active-turn',STATE.currentPlayer===1&&STATE.started);
+  document.getElementById('p2Card').classList.toggle('active-turn',STATE.currentPlayer===2&&STATE.started);
+  const db=document.getElementById('diceBtn');
+  if(db&&STATE.started) db.disabled=STATE.pendingQ||(STATE.currentPlayer!==myPlayer);
+  if(STATE.started&&!STATE.pendingQ){
+    const names=[p1Name(),p2Name()];
+    setStatus(`${names[STATE.currentPlayer-1]}'s turn — roll the dice! 🎲`);
+  }
+}
+
+function setStatus(t){ document.getElementById('statusBar').textContent=t; }
+function p1Name(){ return document.getElementById('p1Name').value||'Player 1'; }
+function p2Name(){ return document.getElementById('p2Name').value||'Player 2'; }
+function onNameChange(){ send({type:'name',player:myPlayer,name:myPlayer===1?p1Name():p2Name()}); }
+function setConn(color,msg){
+  document.getElementById('connDot').className='dot '+color;
+  document.getElementById('connText').textContent=msg;
+}
+
+function toggleCat(btn){
+  const cat=btn.dataset.cat;
+  if(STATE.activeCats.includes(cat)){
+    if(STATE.activeCats.length===1) return;
+    STATE.activeCats=STATE.activeCats.filter(c=>c!==cat);
+    btn.classList.remove('active');
+  } else {
+    STATE.activeCats.push(cat);
+    btn.classList.add('active');
+  }
+}
+
+function copyLink(){
+  const url=document.getElementById('shareUrl').textContent;
+  const btn=document.getElementById('copyBtn');
+  const ok=()=>{
+    btn.textContent='✅ Copied!'; btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Copy';btn.classList.remove('copied');},2200);
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(ok).catch(()=>fbCopy(url,ok));
+  } else { fbCopy(url,ok); }
+}
+function fbCopy(t,cb){
+  const ta=document.createElement('textarea');
+  ta.value=t; ta.style.cssText='position:fixed;opacity:0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{document.execCommand('copy');cb();}catch(e){}
+  document.body.removeChild(ta);
+}
+
+function spawnConfetti(){
+  const cols=['#ef4444','#3b82f6','#f59e0b','#22c55e','#c084fc','#fb923c'];
+  for(let i=0;i<80;i++){
+    const el=document.createElement('div');
+    el.className='confetti-p';
+    const sz=7+Math.random()*10;
+    el.style.cssText=`left:${Math.random()*100}vw;top:-16px;width:${sz}px;height:${sz}px;
+      background:${cols[Math.floor(Math.random()*cols.length)]};
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      animation-duration:${1.8+Math.random()*2}s;animation-delay:${Math.random()*.8}s`;
+    document.body.appendChild(el);
+    el.addEventListener('animationend',()=>el.remove());
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────
+initBoardDOM();
+renderPieces();
+initNetwork();
+</script>
+</body>
+</html>

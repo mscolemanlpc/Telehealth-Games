@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inside Out Therapeutic Adventure</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
+<style>
+:root {
+  --joy:    #FFD700;
+  --sadness:#4A90D9;
+  --anger:  #E63946;
+  --fear:   #9B5DE5;
+  --disgust:#2DC653;
+  --bg:     #0D1B2A;
+  --bg2:    #1B2A3B;
+  --card:   rgba(255,255,255,0.07);
+  --card2:  rgba(255,255,255,0.12);
+  --white:  #FFFFFF;
+  --text:   #E8F4FD;
+  --muted:  #8BACC8;
+  --radius: 18px;
+  --active: #FFD700;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:118%;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* Stars BG */
+.stars-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.star-dot{position:absolute;background:white;border-radius:50%;animation:twinkle ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:.1;transform:scale(1)}50%{opacity:.7;transform:scale(1.3)}}
+
+/* Page wrapper */
+#page{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:20px 16px 40px;display:flex;flex-direction:column;align-items:center;gap:18px;}
+
+/* Header */
+.game-header{text-align:center;width:100%;}
+.game-logo{font-family:'Fredoka One',cursive;font-size:clamp(2.2rem,6vw,3.4rem);background:linear-gradient(135deg,#FFD700,#FF6B6B,#9B5DE5,#4A90D9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1px;line-height:1.1;}
+.game-tagline{font-size:0.9rem;font-weight:700;color:var(--muted);margin-top:4px;letter-spacing:0.5px;}
+
+/* Share / connect bar */
+.connect-bar{width:100%;background:var(--card2);border-radius:var(--radius);padding:14px 18px;border:1px solid rgba(255,255,255,0.1);}
+.connect-label{font-size:0.82rem;font-weight:800;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px;}
+.connect-row{display:flex;gap:10px;align-items:center;}
+.share-url{flex:1;font-size:0.78rem;color:var(--text);background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:8px 12px;font-family:monospace;min-height:36px;display:flex;align-items:center;word-break:break-all;user-select:all;}
+.copy-btn{font-family:'Nunito',sans-serif;font-weight:800;font-size:0.85rem;padding:8px 16px;border:none;border-radius:10px;background:var(--joy);color:#1a1a00;cursor:pointer;white-space:nowrap;transition:transform .12s,opacity .15s;flex-shrink:0;}
+.copy-btn:hover{transform:scale(1.05);}
+.copy-btn.copied{background:var(--disgust);color:white;}
+.conn-row{margin-top:8px;font-size:0.8rem;font-weight:700;display:flex;align-items:center;gap:6px;color:var(--muted);}
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;display:inline-block;}
+.dot.orange{background:#f59e0b;box-shadow:0 0 6px #f59e0b;}
+.dot.green{background:var(--disgust);box-shadow:0 0 6px var(--disgust);}
+.dot.red{background:var(--anger);box-shadow:0 0 6px var(--anger);}
+
+/* Role badge */
+.role-row{display:flex;gap:12px;width:100%;flex-wrap:wrap;}
+.role-card{flex:1;min-width:160px;background:var(--card);border-radius:var(--radius);padding:14px 18px;border:2px solid rgba(255,255,255,0.08);position:relative;transition:border-color .2s;}
+.role-card.me{border-color:var(--active);}
+.role-label{font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:4px;}
+.role-name-input{font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--white);background:transparent;border:none;outline:none;width:100%;}
+.role-badge{position:absolute;top:-10px;right:10px;font-size:0.7rem;font-weight:800;padding:2px 10px;border-radius:50px;background:var(--active);color:#1a1a00;text-transform:uppercase;letter-spacing:.5px;}
+.role-icon{font-size:1.8rem;margin-bottom:6px;}
+.role-sub{font-size:0.78rem;color:var(--muted);font-weight:600;}
+
+/* ── GAME SECTIONS ── */
+.sections-nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;}
+.sec-tab{font-family:'Nunito',sans-serif;font-weight:800;font-size:0.8rem;padding:7px 14px;border-radius:50px;border:2px solid rgba(255,255,255,0.12);background:transparent;color:var(--muted);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.sec-tab:hover{border-color:rgba(255,255,255,0.3);color:var(--white);}
+.sec-tab.active{color:#1a1a00;border-color:transparent;}
+.sec-tab[data-sec="emotion"].active{background:var(--joy);}
+.sec-tab[data-sec="coping"].active{background:var(--disgust);}
+.sec-tab[data-sec="scenario"].active{background:var(--anger);}
+.sec-tab[data-sec="cbt"].active{background:var(--fear);}
+.sec-tab[data-sec="debrief"].active{background:var(--sadness);}
+
+/* Section panels */
+.section-panel{display:none;width:100%;}
+.section-panel.active{display:block;}
+
+.panel-card{background:var(--card);border-radius:var(--radius);padding:22px 26px;border:1px solid rgba(255,255,255,0.08);width:100%;}
+.panel-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.panel-emoji{font-size:2.2rem;}
+.panel-title{font-family:'Fredoka One',cursive;font-size:1.6rem;}
+.panel-desc{font-size:0.9rem;color:var(--muted);font-weight:600;margin-top:2px;}
+
+/* ── EMOTION IDENTIFICATION ── */
+.emotion-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px;}
+.emotion-card{border-radius:16px;padding:18px 14px;text-align:center;cursor:pointer;border:3px solid transparent;transition:all .2s;position:relative;}
+.emotion-card:hover{transform:translateY(-4px);filter:brightness(1.1);}
+.emotion-card.selected{border-color:white;box-shadow:0 0 20px rgba(255,255,255,0.3);transform:translateY(-4px);}
+.emotion-card.joy    {background:linear-gradient(135deg,#FFD700,#FFA500);}
+.emotion-card.sadness{background:linear-gradient(135deg,#4A90D9,#1a5276);}
+.emotion-card.anger  {background:linear-gradient(135deg,#E63946,#8B0000);}
+.emotion-card.fear   {background:linear-gradient(135deg,#9B5DE5,#5A189A);}
+.emotion-card.disgust{background:linear-gradient(135deg,#2DC653,#145A32);}
+.emotion-card.anxiety{background:linear-gradient(135deg,#FF6B35,#C0392B);}
+.emotion-emoji{font-size:3rem;margin-bottom:8px;}
+.emotion-name{font-family:'Fredoka One',cursive;font-size:1.1rem;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.3);}
+.emotion-body-list{font-size:0.78rem;color:rgba(255,255,255,0.85);margin-top:5px;line-height:1.5;}
+
+.emotion-detail{background:rgba(0,0,0,0.3);border-radius:14px;padding:16px 20px;margin-top:4px;display:none;}
+.emotion-detail.visible{display:block;}
+.detail-title{font-family:'Fredoka One',cursive;font-size:1.1rem;margin-bottom:10px;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.detail-box{background:rgba(255,255,255,0.07);border-radius:12px;padding:12px 14px;}
+.detail-box-title{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px;}
+.detail-box-text{font-size:0.88rem;font-weight:600;color:var(--text);line-height:1.5;}
+
+/* ── COPING SKILLS ── */
+.coping-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+.coping-card{background:rgba(0,0,0,0.3);border-radius:14px;padding:16px;border:2px solid rgba(255,255,255,0.1);cursor:pointer;transition:all .2s;text-align:center;}
+.coping-card:hover{border-color:var(--disgust);transform:translateY(-2px);}
+.coping-card.active-skill{border-color:var(--disgust);background:rgba(45,198,83,0.15);}
+.coping-emoji{font-size:2.4rem;margin-bottom:8px;}
+.coping-name{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--white);margin-bottom:4px;}
+.coping-desc{font-size:0.8rem;color:var(--muted);font-weight:600;line-height:1.4;}
+.coping-steps{margin-top:10px;background:rgba(0,0,0,0.3);border-radius:10px;padding:10px 12px;display:none;text-align:left;}
+.coping-steps.visible{display:block;}
+.coping-step{font-size:0.82rem;font-weight:600;color:var(--text);padding:3px 0;display:flex;gap:8px;}
+.step-num{color:var(--disgust);font-weight:800;flex-shrink:0;}
+
+/* ── SCENARIO ── */
+.scenario-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.scenario-emotion-pick{display:flex;gap:8px;flex-wrap:wrap;}
+.scenario-emo-btn{font-family:'Nunito',sans-serif;font-weight:800;font-size:0.8rem;padding:5px 12px;border-radius:50px;border:2px solid transparent;cursor:pointer;transition:all .15s;}
+.scenario-emo-btn.joy    {background:rgba(255,215,0,.15);border-color:#FFD700;color:#FFD700;}
+.scenario-emo-btn.sadness{background:rgba(74,144,217,.15);border-color:#4A90D9;color:#4A90D9;}
+.scenario-emo-btn.anger  {background:rgba(230,57,70,.15);border-color:#E63946;color:#E63946;}
+.scenario-emo-btn.fear   {background:rgba(155,93,229,.15);border-color:#9B5DE5;color:#9B5DE5;}
+.scenario-emo-btn.disgust{background:rgba(45,198,83,.15);border-color:#2DC653;color:#2DC653;}
+.scenario-emo-btn.active-emo{color:white!important;opacity:1;}
+.scenario-emo-btn.joy.active-emo    {background:#FFD700;}
+.scenario-emo-btn.sadness.active-emo{background:#4A90D9;}
+.scenario-emo-btn.anger.active-emo  {background:#E63946;}
+.scenario-emo-btn.fear.active-emo   {background:#9B5DE5;}
+.scenario-emo-btn.disgust.active-emo{background:#2DC653;}
+
+.scenario-box{background:rgba(0,0,0,0.35);border-radius:14px;padding:20px;margin-bottom:14px;border-left:4px solid var(--anger);}
+.scenario-label{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--anger);margin-bottom:8px;}
+.scenario-text{font-size:1.02rem;font-weight:700;color:var(--white);line-height:1.6;}
+
+.scenario-questions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.sq-box{background:rgba(0,0,0,0.25);border-radius:12px;padding:14px;}
+.sq-label{font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px;}
+.sq-textarea{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;font-family:'Nunito',sans-serif;font-size:0.88rem;color:var(--white);resize:vertical;min-height:72px;outline:none;transition:border-color .2s;}
+.sq-textarea:focus{border-color:var(--anger);}
+
+/* ── CBT THOUGHT CHECK ── */
+.cbt-flow{display:flex;flex-direction:column;gap:12px;}
+.cbt-step{background:rgba(0,0,0,0.3);border-radius:14px;padding:16px 18px;border-left:4px solid var(--fear);position:relative;}
+.cbt-step-num{position:absolute;top:-10px;left:14px;background:var(--fear);color:white;font-family:'Fredoka One',cursive;font-size:0.82rem;padding:2px 10px;border-radius:50px;}
+.cbt-step-title{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--white);margin-bottom:6px;margin-top:4px;}
+.cbt-step-prompt{font-size:0.85rem;color:var(--muted);font-weight:600;margin-bottom:8px;line-height:1.5;}
+.cbt-textarea{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;font-family:'Nunito',sans-serif;font-size:0.88rem;color:var(--white);resize:vertical;min-height:68px;outline:none;transition:border-color .2s;}
+.cbt-textarea:focus{border-color:var(--fear);}
+.distortion-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.d-chip{font-size:0.75rem;font-weight:700;padding:4px 11px;border-radius:50px;background:rgba(155,93,229,0.2);border:1.5px solid rgba(155,93,229,0.4);color:var(--fear);cursor:pointer;transition:all .15s;}
+.d-chip:hover,.d-chip.picked{background:var(--fear);color:white;border-color:var(--fear);}
+
+/* ── DEBRIEF ── */
+.debrief-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.debrief-box{background:rgba(0,0,0,0.3);border-radius:14px;padding:16px;}
+.debrief-icon{font-size:1.8rem;margin-bottom:8px;}
+.debrief-title{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--white);margin-bottom:6px;}
+.debrief-textarea{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px;font-family:'Nunito',sans-serif;font-size:0.85rem;color:var(--white);resize:vertical;min-height:72px;outline:none;}
+.debrief-textarea:focus{border-color:var(--sadness);}
+
+.passport{background:linear-gradient(135deg,rgba(74,144,217,0.2),rgba(155,93,229,0.2));border-radius:16px;padding:20px;border:2px solid rgba(74,144,217,0.4);text-align:center;}
+.passport-title{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--sadness);margin-bottom:12px;}
+.stamps{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+.stamp{width:72px;height:72px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.6rem;border:3px dashed;opacity:0.35;transition:all .4s;cursor:default;}
+.stamp.earned{opacity:1;border-style:solid;animation:stamp-pop .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes stamp-pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.stamp.s-emotion{border-color:var(--joy);background:rgba(255,215,0,0.15);}
+.stamp.s-coping {border-color:var(--disgust);background:rgba(45,198,83,0.15);}
+.stamp.s-scenario{border-color:var(--anger);background:rgba(230,57,70,0.15);}
+.stamp.s-cbt    {border-color:var(--fear);background:rgba(155,93,229,0.15);}
+.stamp.s-debrief{border-color:var(--sadness);background:rgba(74,144,217,0.15);}
+.stamp-label{font-size:0.6rem;font-weight:800;color:var(--muted);margin-top:2px;}
+
+/* Roll dice button */
+.roll-btn{font-family:'Fredoka One',cursive;font-size:1.1rem;padding:10px 24px;border:none;border-radius:50px;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 16px rgba(0,0,0,0.3);}
+.roll-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.35);}
+.roll-btn.joy-btn    {background:var(--joy);color:#1a1a00;}
+.roll-btn.sadness-btn{background:var(--sadness);color:white;}
+.roll-btn.anger-btn  {background:var(--anger);color:white;}
+.roll-btn.fear-btn   {background:var(--fear);color:white;}
+.roll-btn.disgust-btn{background:var(--disgust);color:white;}
+.roll-btn.default-btn{background:linear-gradient(135deg,var(--joy),var(--anger));color:white;}
+
+/* Generic action btn */
+.action-btn{font-family:'Nunito',sans-serif;font-weight:800;font-size:0.88rem;padding:9px 20px;border:none;border-radius:50px;cursor:pointer;transition:transform .12s;box-shadow:0 3px 10px rgba(0,0,0,0.2);}
+.action-btn:hover{transform:translateY(-2px);}
+.btn-complete{background:var(--disgust);color:white;}
+.btn-next{background:var(--joy);color:#1a1a00;}
+.btn-soft{background:rgba(255,255,255,0.1);color:var(--text);}
+
+/* Progress bar */
+.progress-row{width:100%;display:flex;align-items:center;gap:10px;}
+.progress-label{font-size:0.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+.progress-bar{flex:1;height:8px;background:rgba(255,255,255,0.1);border-radius:50px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--joy),var(--anger),var(--fear));border-radius:50px;transition:width .5s ease;}
+
+/* Therapist note */
+.therapist-note{background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);border-radius:12px;padding:12px 16px;font-size:0.82rem;color:rgba(255,215,0,0.85);font-weight:600;line-height:1.5;margin-top:10px;}
+.therapist-note strong{color:var(--joy);}
+body.is-client .therapist-note{display:none!important;}
+
+/* Footer */
+.footer{font-size:0.75rem;font-weight:700;color:rgba(255,255,255,0.3);text-align:center;padding-bottom:4px;}
+
+/* Divider */
+.divider{width:100%;height:1px;background:rgba(255,255,255,0.08);margin:4px 0;}
+
+/* ── MIRROR PANEL (therapist only) ── */
+#mirrorToggle{
+  display:none; /* shown only for host via JS */
+  position:fixed; right:0; top:50%; transform:translateY(-50%);
+  z-index:500; background:var(--joy); color:#1a1a00;
+  font-family:'Fredoka One',cursive; font-size:0.85rem;
+  padding:10px 8px; border-radius:14px 0 0 14px;
+  writing-mode:vertical-rl; text-orientation:mixed;
+  cursor:pointer; border:none; box-shadow:-3px 0 14px rgba(0,0,0,0.3);
+  letter-spacing:1px; transition:background .2s;
+}
+#mirrorToggle:hover{background:#ffe066;}
+#mirrorToggle.open{background:#ffe066;}
+
+#mirrorPanel{
+  display:none; /* shown only for host via JS */
+  position:fixed; right:0; top:0; bottom:0; z-index:499;
+  width:360px; max-width:90vw;
+  background:#0a1520; border-left:2px solid rgba(255,215,0,0.3);
+  box-shadow:-8px 0 32px rgba(0,0,0,0.5);
+  transform:translateX(100%); transition:transform .3s ease;
+  overflow-y:auto; flex-direction:column;
+}
+#mirrorPanel.open{transform:translateX(0);}
+.mirror-header{
+  position:sticky; top:0; z-index:10;
+  background:#0a1520; border-bottom:1px solid rgba(255,215,0,0.2);
+  padding:14px 16px; display:flex; align-items:center; justify-content:space-between;
+}
+.mirror-title{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--joy);}
+.mirror-subtitle{font-size:0.72rem;color:var(--muted);font-weight:700;margin-top:2px;}
+.mirror-close{background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;padding:0 4px;line-height:1;}
+.mirror-close:hover{color:var(--white);}
+.mirror-body{padding:14px 16px;display:flex;flex-direction:column;gap:14px;}
+.mirror-section{background:rgba(255,255,255,0.05);border-radius:12px;overflow:hidden;}
+.mirror-sec-header{
+  padding:10px 14px; font-family:'Fredoka One',cursive; font-size:0.9rem;
+  display:flex;align-items:center;gap:8px;
+}
+.mirror-row{padding:8px 14px;border-top:1px solid rgba(255,255,255,0.06);}
+.mirror-row-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:4px;}
+.mirror-row-value{font-size:0.85rem;font-weight:600;color:var(--text);line-height:1.5;min-height:20px;white-space:pre-wrap;}
+.mirror-row-value.empty{color:rgba(255,255,255,0.2);font-style:italic;}
+.mirror-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+.mirror-chip{font-size:0.72rem;font-weight:700;padding:3px 9px;border-radius:50px;background:rgba(155,93,229,0.3);color:#c4a3f5;}
+.mirror-pulse{animation:mpulse .6s ease;}
+@keyframes mpulse{0%,100%{background:rgba(255,255,255,0.05)}50%{background:rgba(255,215,0,0.12)}}
+.mirror-no-conn{padding:20px 16px;text-align:center;color:var(--muted);font-size:0.85rem;font-weight:600;}
+
+/* Section complete banner */
+.complete-banner{background:linear-gradient(135deg,rgba(45,198,83,0.2),rgba(45,198,83,0.05));border:2px solid rgba(45,198,83,0.4);border-radius:14px;padding:14px 18px;display:none;align-items:center;gap:12px;margin-top:14px;}
+.complete-banner.show{display:flex;}
+.complete-banner-text{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--disgust);}
+
+/* Confetti */
+.conf-p{position:fixed;pointer-events:none;z-index:999;border-radius:3px;animation:cf linear forwards;}
+@keyframes cf{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+@media(max-width:580px){
+  .scenario-questions{grid-template-columns:1fr;}
+  .debrief-grid{grid-template-columns:1fr;}
+  .detail-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="stars-bg" id="starsBg"></div>
+
+<div id="page">
+
+  <!-- Header -->
+  <div class="game-header">
+    <div class="game-logo">Inside Out Therapeutic Adventure</div>
+    <div class="game-tagline">Playful Strategies for Real Life Challenges</div>
+  </div>
+
+  <!-- Share / Connect -->
+  <div class="connect-bar">
+    <div class="connect-label">🔗 Share this link with your client:</div>
+    <div class="connect-row">
+      <div class="share-url" id="shareUrl">Generating link...</div>
+      <button class="copy-btn" id="copyBtn" onclick="copyLink()">📋 Copy</button>
+    </div>
+    <div class="conn-row">
+      <span class="dot orange" id="connDot"></span>
+      <span id="connText">Connecting...</span>
+    </div>
+  </div>
+
+  <!-- Role cards -->
+  <div class="role-row">
+    <div class="role-card" id="myRoleCard">
+      <div class="role-badge" id="myRoleBadge">YOU</div>
+      <div class="role-icon" id="myRoleIcon">🪄</div>
+      <div class="role-label" id="myRoleLabel">Therapist</div>
+      <input class="role-name-input" id="myName" value="Therapist" maxlength="16" oninput="onNameChange()">
+      <div class="role-sub" id="myRoleSub">Leading the session</div>
+    </div>
+    <div class="role-card" id="otherRoleCard">
+      <div class="role-icon" id="otherRoleIcon">⭐</div>
+      <div class="role-label" id="otherRoleLabel">Client</div>
+      <input class="role-name-input" id="otherName" value="Waiting..." maxlength="16" oninput="onOtherNameChange()">
+      <div class="role-sub">Exploring emotions</div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-row">
+    <div class="progress-label">Adventure Progress</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div style="font-size:0.8rem;font-weight:800;color:var(--muted)" id="progressText">0/5</div>
+  </div>
+
+  <!-- Section tabs -->
+  <div class="sections-nav">
+    <button class="sec-tab active" data-sec="emotion" onclick="switchSection('emotion')">😊 Emotion ID</button>
+    <button class="sec-tab" data-sec="coping"   onclick="switchSection('coping')">💪 Coping Skills</button>
+    <button class="sec-tab" data-sec="scenario" onclick="switchSection('scenario')">🎬 Scenario</button>
+    <button class="sec-tab" data-sec="cbt"      onclick="switchSection('cbt')">🧩 CBT Thought Check</button>
+    <button class="sec-tab" data-sec="debrief"  onclick="switchSection('debrief')">🌟 Debrief</button>
+  </div>
+
+  <!-- ══════════════════ EMOTION IDENTIFICATION ══════════════════ -->
+  <div class="section-panel active" id="panel-emotion">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-emoji">😊</div>
+        <div>
+          <div class="panel-title" style="color:var(--joy)">Emotion Identification</div>
+          <div class="panel-desc">Tap an emotion to explore how it feels in your body and mind</div>
+        </div>
+      </div>
+
+      <div class="emotion-grid">
+        <div class="emotion-card joy" onclick="selectEmotion('joy')">
+          <div class="emotion-emoji">😄</div>
+          <div class="emotion-name">Joy</div>
+          <div class="emotion-body-list">Warm chest · Smiling · Light</div>
+        </div>
+        <div class="emotion-card sadness" onclick="selectEmotion('sadness')">
+          <div class="emotion-emoji">😢</div>
+          <div class="emotion-name">Sadness</div>
+          <div class="emotion-body-list">Heavy chest · Tired · Tearful</div>
+        </div>
+        <div class="emotion-card anger" onclick="selectEmotion('anger')">
+          <div class="emotion-emoji">😠</div>
+          <div class="emotion-name">Anger</div>
+          <div class="emotion-body-list">Hot face · Tight fists · Loud</div>
+        </div>
+        <div class="emotion-card fear" onclick="selectEmotion('fear')">
+          <div class="emotion-emoji">😨</div>
+          <div class="emotion-name">Fear</div>
+          <div class="emotion-body-list">Fast heart · Frozen · Sweaty</div>
+        </div>
+        <div class="emotion-card disgust" onclick="selectEmotion('disgust')">
+          <div class="emotion-emoji">🤢</div>
+          <div class="emotion-name">Disgust</div>
+          <div class="emotion-body-list">Wrinkled nose · Uneasy tummy</div>
+        </div>
+        <div class="emotion-card anxiety" onclick="selectEmotion('anxiety')">
+          <div class="emotion-emoji">😰</div>
+          <div class="emotion-name">Anxiety</div>
+          <div class="emotion-body-list">Racing mind · Butterflies · Tense</div>
+        </div>
+      </div>
+
+      <div class="emotion-detail" id="emotionDetail">
+        <div class="detail-title" id="detailTitle"></div>
+        <div class="detail-grid">
+          <div class="detail-box">
+            <div class="detail-box-title">🧠 What the Brain Does</div>
+            <div class="detail-box-text" id="detailBrain"></div>
+          </div>
+          <div class="detail-box">
+            <div class="detail-box-title">💬 What You Might Say</div>
+            <div class="detail-box-text" id="detailSay"></div>
+          </div>
+          <div class="detail-box">
+            <div class="detail-box-title">🌡️ Body Signals</div>
+            <div class="detail-box-text" id="detailBody"></div>
+          </div>
+          <div class="detail-box">
+            <div class="detail-box-title">✨ Healthy Response</div>
+            <div class="detail-box-text" id="detailResponse"></div>
+          </div>
+        </div>
+        <div class="therapist-note" id="emotionTherapistNote"></div>
+      </div>
+
+      <div class="complete-banner" id="emotionComplete">
+        <span style="font-size:2rem">🌟</span>
+        <div>
+          <div class="complete-banner-text">Emotion Badge Earned!</div>
+          <div style="font-size:0.82rem;color:var(--muted)">Great exploring! Move on to Coping Skills.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center">
+        <button class="action-btn btn-complete" onclick="completeSection('emotion')">✓ Complete Section</button>
+        <button class="action-btn btn-next" onclick="switchSection('coping')">Next: Coping Skills →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ COPING SKILLS CHALLENGE ══════════════════ -->
+  <div class="section-panel" id="panel-coping">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-emoji">💪</div>
+        <div>
+          <div class="panel-title" style="color:var(--disgust)">Coping Skills Challenge</div>
+          <div class="panel-desc">Pick a skill, read the steps, and try it together!</div>
+        </div>
+      </div>
+
+      <div class="coping-grid" id="copingGrid"></div>
+
+      <div class="therapist-note" style="margin-top:14px">
+        <strong>Therapist guide:</strong> Invite your client to pick a skill they want to try. Do it together in real time! After trying it, ask: "How does your body feel now compared to before?"
+      </div>
+
+      <div class="complete-banner" id="copingComplete">
+        <span style="font-size:2rem">💪</span>
+        <div>
+          <div class="complete-banner-text">Coping Skills Badge Earned!</div>
+          <div style="font-size:0.82rem;color:var(--muted)">Amazing work! On to the Scenario Challenge.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+        <button class="action-btn btn-complete" onclick="completeSection('coping')">✓ Complete Section</button>
+        <button class="action-btn btn-next" onclick="switchSection('scenario')">Next: Scenario →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ SCENARIO & PROBLEM SOLVING ══════════════════ -->
+  <div class="section-panel" id="panel-scenario">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-emoji">🎬</div>
+        <div>
+          <div class="panel-title" style="color:var(--anger)">Scenario & Problem Solving</div>
+          <div class="panel-desc">Read the scenario together, then explore it from different angles</div>
+        </div>
+      </div>
+
+      <div class="scenario-bar">
+        <div class="scenario-emotion-pick">
+          <button class="scenario-emo-btn joy"     onclick="filterScenario('joy')"    >😄 Joy</button>
+          <button class="scenario-emo-btn sadness"  onclick="filterScenario('sadness')">😢 Sadness</button>
+          <button class="scenario-emo-btn anger"    onclick="filterScenario('anger')"  >😠 Anger</button>
+          <button class="scenario-emo-btn fear"     onclick="filterScenario('fear')"   >😨 Fear</button>
+          <button class="scenario-emo-btn disgust"  onclick="filterScenario('disgust')">🤢 Disgust</button>
+        </div>
+        <button class="action-btn btn-soft" onclick="randomScenario()">🎲 Random Scenario</button>
+      </div>
+
+      <div class="scenario-box">
+        <div class="scenario-label" id="scenarioEmotionLabel">Scenario</div>
+        <div class="scenario-text" id="scenarioText">Click a feeling button or 🎲 Random Scenario to get started!</div>
+      </div>
+
+      <div class="scenario-questions">
+        <div class="sq-box">
+          <div class="sq-label" style="color:var(--anger)">💭 What might the character think?</div>
+          <textarea class="sq-textarea" id="sqThink" placeholder="Write the character's thoughts..." oninput="syncField('sqThink',this.value)"></textarea>
+        </div>
+        <div class="sq-box">
+          <div class="sq-label" style="color:var(--fear)">🌡️ How does this emotion show in the body?</div>
+          <textarea class="sq-textarea" id="sqBody" placeholder="Describe the body sensations..." oninput="syncField('sqBody',this.value)"></textarea>
+        </div>
+        <div class="sq-box">
+          <div class="sq-label" style="color:var(--joy)">🛤️ What choices does the character have?</div>
+          <textarea class="sq-textarea" id="sqChoices" placeholder="List possible choices..." oninput="syncField('sqChoices',this.value)"></textarea>
+        </div>
+        <div class="sq-box">
+          <div class="sq-label" style="color:var(--disgust)">⭐ What would be the best choice and why?</div>
+          <textarea class="sq-textarea" id="sqBest" placeholder="Explain the best choice..." oninput="syncField('sqBest',this.value)"></textarea>
+        </div>
+      </div>
+
+      <div class="therapist-note" style="margin-top:14px">
+        <strong>Therapist guide:</strong> Read the scenario aloud together. Ask your client to fill in the boxes from the character's perspective first, then relate it to their own life: "Has anything like this ever happened to you?"
+      </div>
+
+      <div class="complete-banner" id="scenarioComplete">
+        <span style="font-size:2rem">🎬</span>
+        <div>
+          <div class="complete-banner-text">Scenario Badge Earned!</div>
+          <div style="font-size:0.82rem;color:var(--muted)">Excellent problem solving! On to the CBT Thought Check.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+        <button class="action-btn btn-complete" onclick="completeSection('scenario')">✓ Complete Section</button>
+        <button class="action-btn btn-next" onclick="switchSection('cbt')">Next: CBT Check →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ CBT THOUGHT CHECK ══════════════════ -->
+  <div class="section-panel" id="panel-cbt">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-emoji">🧩</div>
+        <div>
+          <div class="panel-title" style="color:var(--fear)">CBT Thought Check</div>
+          <div class="panel-desc">Challenge unhelpful thoughts and find balanced ones — step by step</div>
+        </div>
+      </div>
+
+      <div class="cbt-flow">
+        <div class="cbt-step">
+          <div class="cbt-step-num">Step 1</div>
+          <div class="cbt-step-title">🌩️ What is the worry or difficult thought?</div>
+          <div class="cbt-step-prompt">Write out the thought exactly as it feels. Don't judge it — just capture it.</div>
+          <textarea class="cbt-textarea" id="cbt1" placeholder='e.g. "Nobody likes me" or "I always mess up"' oninput="syncField('cbt1',this.value)"></textarea>
+        </div>
+
+        <div class="cbt-step">
+          <div class="cbt-step-num">Step 2</div>
+          <div class="cbt-step-title">🔍 Is there a thinking trap? (Cognitive Distortion)</div>
+          <div class="cbt-step-prompt">Does this thought match any of these common thinking traps? Tap any that apply:</div>
+          <div class="distortion-chips" id="distortionChips"></div>
+        </div>
+
+        <div class="cbt-step">
+          <div class="cbt-step-num">Step 3</div>
+          <div class="cbt-step-title">📋 What is the evidence FOR this thought?</div>
+          <div class="cbt-step-prompt">What facts or experiences make you believe this thought might be true?</div>
+          <textarea class="cbt-textarea" id="cbt3" placeholder="List evidence that supports the thought..." oninput="syncField('cbt3',this.value)"></textarea>
+        </div>
+
+        <div class="cbt-step">
+          <div class="cbt-step-num">Step 4</div>
+          <div class="cbt-step-title">🌤️ What is the evidence AGAINST this thought?</div>
+          <div class="cbt-step-prompt">What facts or experiences suggest this thought might not be completely true?</div>
+          <textarea class="cbt-textarea" id="cbt4" placeholder="List evidence against the thought..." oninput="syncField('cbt4',this.value)"></textarea>
+        </div>
+
+        <div class="cbt-step">
+          <div class="cbt-step-num">Step 5</div>
+          <div class="cbt-step-title">💡 What else could be true? (Balanced Thought)</div>
+          <div class="cbt-step-prompt">Write a more balanced, helpful thought that takes ALL the evidence into account.</div>
+          <textarea class="cbt-textarea" id="cbt5" placeholder='e.g. "Some people like me, and I can keep trying..."' oninput="syncField('cbt5',this.value)"></textarea>
+        </div>
+
+        <div class="cbt-step">
+          <div class="cbt-step-num">Step 6</div>
+          <div class="cbt-step-title">⭐ What is one helpful action I can take?</div>
+          <div class="cbt-step-prompt">Based on your balanced thought, what is one small, positive thing you can do?</div>
+          <textarea class="cbt-textarea" id="cbt6" placeholder="One helpful action step..." oninput="syncField('cbt6',this.value)"></textarea>
+        </div>
+      </div>
+
+      <div class="therapist-note" style="margin-top:4px">
+        <strong>Therapist guide:</strong> Work through the steps together. You lead Steps 2–4 (evidence gathering) while your client drives Steps 1, 5, and 6. Validate before challenging — "That makes sense you feel that way, AND let's look at all the evidence."
+      </div>
+
+      <div class="complete-banner" id="cbtComplete">
+        <span style="font-size:2rem">🧩</span>
+        <div>
+          <div class="complete-banner-text">CBT Badge Earned!</div>
+          <div style="font-size:0.82rem;color:var(--muted)">Incredible insight! One more — the Debrief!</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+        <button class="action-btn btn-complete" onclick="completeSection('cbt')">✓ Complete Section</button>
+        <button class="action-btn btn-next" onclick="switchSection('debrief')">Next: Debrief →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ DEBRIEF ══════════════════ -->
+  <div class="section-panel" id="panel-debrief">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-emoji">🌟</div>
+        <div>
+          <div class="panel-title" style="color:var(--sadness)">Debrief & Level Up</div>
+          <div class="panel-desc">Wrap up the adventure and celebrate what you learned together</div>
+        </div>
+      </div>
+
+      <div class="debrief-grid">
+        <div class="debrief-box">
+          <div class="debrief-icon">💡</div>
+          <div class="debrief-title">What did we learn today?</div>
+          <textarea class="debrief-textarea" id="db1" placeholder="Key insights from this session..." oninput="syncField('db1',this.value)"></textarea>
+        </div>
+        <div class="debrief-box">
+          <div class="debrief-icon">📈</div>
+          <div class="debrief-title">How did the emotion change?</div>
+          <textarea class="debrief-textarea" id="db2" placeholder="Describe the emotional shift..." oninput="syncField('db2',this.value)"></textarea>
+        </div>
+        <div class="debrief-box">
+          <div class="debrief-icon">🛠️</div>
+          <div class="debrief-title">What coping skill worked best?</div>
+          <textarea class="debrief-textarea" id="db3" placeholder="Which skill helped the most?" oninput="syncField('db3',this.value)"></textarea>
+        </div>
+        <div class="debrief-box">
+          <div class="debrief-icon">🔮</div>
+          <div class="debrief-title">What would you try next time?</div>
+          <textarea class="debrief-textarea" id="db4" placeholder="Ideas for next session or real life..." oninput="syncField('db4',this.value)"></textarea>
+        </div>
+      </div>
+
+      <div class="debrief-box" style="margin-bottom:14px">
+        <div class="debrief-icon">🎯</div>
+        <div class="debrief-title">My Goal Before Next Session</div>
+        <textarea class="debrief-textarea" id="db5" placeholder="One small goal to practice this week..." style="min-height:56px" oninput="syncField('db5',this.value)"></textarea>
+      </div>
+
+      <!-- Progress Passport -->
+      <div class="passport">
+        <div class="passport-title">🎒 Progress Passport</div>
+        <div class="stamps">
+          <div class="stamp s-emotion" id="stamp-emotion"><span>😊</span><span class="stamp-label">Emotion</span></div>
+          <div class="stamp s-coping"  id="stamp-coping" ><span>💪</span><span class="stamp-label">Coping</span></div>
+          <div class="stamp s-scenario"id="stamp-scenario"><span>🎬</span><span class="stamp-label">Scenario</span></div>
+          <div class="stamp s-cbt"     id="stamp-cbt"    ><span>🧩</span><span class="stamp-label">CBT</span></div>
+          <div class="stamp s-debrief" id="stamp-debrief"><span>🌟</span><span class="stamp-label">Debrief</span></div>
+        </div>
+        <div style="margin-top:14px;font-size:0.88rem;color:var(--muted);font-weight:700" id="passportMsg">Complete each section to earn your stamps!</div>
+      </div>
+
+      <div class="therapist-note" style="margin-top:14px">
+        <strong>Therapist guide:</strong> Review the passport together. Celebrate every stamp! For the goal, keep it SMART — specific and achievable before next session. Consider printing or screenshotting the passport as a takeaway.
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+        <button class="action-btn btn-complete" onclick="completeSection('debrief')">✓ Complete Session! 🎉</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">© Michelle S. Coleman LPC PLLC — All Rights Reserved</div>
+</div>
+
+<!-- Mirror toggle tab (therapist only, shown via JS) -->
+<button id="mirrorToggle" onclick="toggleMirror()">👁 Client View</button>
+
+<!-- Mirror panel -->
+<div id="mirrorPanel">
+  <div class="mirror-header">
+    <div>
+      <div class="mirror-title">👁 Client Screen Mirror</div>
+      <div class="mirror-subtitle">Live view of what your client sees &amp; types</div>
+    </div>
+    <button class="mirror-close" onclick="toggleMirror()">✕</button>
+  </div>
+  <div class="mirror-body" id="mirrorBody">
+    <div class="mirror-no-conn" id="mirrorNoConn">Waiting for client to connect...</div>
+
+    <!-- Emotion section -->
+    <div class="mirror-section" id="mSec-emotion" style="display:none">
+      <div class="mirror-sec-header" style="background:rgba(255,215,0,0.12);color:#FFD700;">😊 Emotion Identification</div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Selected Emotion</div>
+        <div class="mirror-row-value empty" id="m-emotion">Not selected yet</div>
+      </div>
+    </div>
+
+    <!-- Coping section -->
+    <div class="mirror-section" id="mSec-coping" style="display:none">
+      <div class="mirror-sec-header" style="background:rgba(45,198,83,0.12);color:#2DC653;">💪 Coping Skills</div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Skill Selected</div>
+        <div class="mirror-row-value empty" id="m-coping">Not selected yet</div>
+      </div>
+    </div>
+
+    <!-- Scenario section -->
+    <div class="mirror-section" id="mSec-scenario" style="display:none">
+      <div class="mirror-sec-header" style="background:rgba(230,57,70,0.12);color:#E63946;">🎬 Scenario</div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Current Scenario</div>
+        <div class="mirror-row-value empty" id="m-scenarioText">No scenario selected</div>
+      </div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Character's Thoughts</div>
+        <div class="mirror-row-value empty" id="m-sqThink">...</div>
+      </div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Body Sensations</div>
+        <div class="mirror-row-value empty" id="m-sqBody">...</div>
+      </div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Possible Choices</div>
+        <div class="mirror-row-value empty" id="m-sqChoices">...</div>
+      </div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Best Choice</div>
+        <div class="mirror-row-value empty" id="m-sqBest">...</div>
+      </div>
+    </div>
+
+    <!-- CBT section -->
+    <div class="mirror-section" id="mSec-cbt" style="display:none">
+      <div class="mirror-sec-header" style="background:rgba(155,93,229,0.12);color:#9B5DE5;">🧩 CBT Thought Check</div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Step 1 – The Worry</div>
+        <div class="mirror-row-value empty" id="m-cbt1">...</div>
+      </div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Step 2 – Thinking Traps</div>
+        <div class="mirror-chips" id="m-distortions"></div>
+      </div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Step 3 – Evidence For</div>
+        <div class="mirror-row-value empty" id="m-cbt3">...</div>
+      </div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Step 4 – Evidence Against</div>
+        <div class="mirror-row-value empty" id="m-cbt4">...</div>
+      </div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Step 5 – Balanced Thought</div>
+        <div class="mirror-row-value empty" id="m-cbt5">...</div>
+      </div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Step 6 – Action Step</div>
+        <div class="mirror-row-value empty" id="m-cbt6">...</div>
+      </div>
+    </div>
+
+    <!-- Debrief section -->
+    <div class="mirror-section" id="mSec-debrief" style="display:none">
+      <div class="mirror-sec-header" style="background:rgba(74,144,217,0.12);color:#4A90D9;">🌟 Debrief</div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">What we learned</div>
+        <div class="mirror-row-value empty" id="m-db1">...</div>
+      </div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Emotion change</div>
+        <div class="mirror-row-value empty" id="m-db2">...</div>
+      </div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Best coping skill</div>
+        <div class="mirror-row-value empty" id="m-db3">...</div>
+      </div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Try next time</div>
+        <div class="mirror-row-value empty" id="m-db4">...</div>
+      </div>
+      <div class="mirror-row">
+        <div class="mirror-row-label">Goal before next session</div>
+        <div class="mirror-row-value empty" id="m-db5">...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Mirror Panel ──────────────────────────────────────────────
+let mirrorOpen = false;
+let clientConnected = false;
+let distortionsMirror = new Set();
+
+function toggleMirror(){
+  mirrorOpen = !mirrorOpen;
+  document.getElementById('mirrorPanel').classList.toggle('open', mirrorOpen);
+  document.getElementById('mirrorToggle').classList.toggle('open', mirrorOpen);
+  document.getElementById('mirrorPanel').style.display = 'flex';
+}
+
+function showMirrorForHost(){
+  document.getElementById('mirrorToggle').style.display = 'block';
+  document.getElementById('mirrorPanel').style.display = 'flex';
+}
+
+function mirrorClientConnected(){
+  clientConnected = true;
+  document.getElementById('mirrorNoConn').style.display = 'none';
+  // Show all section mirrors
+  ['emotion','coping','scenario','cbt','debrief'].forEach(s=>{
+    document.getElementById(`mSec-${s}`).style.display = 'block';
+  });
+}
+
+function mirrorUpdate(id, val){
+  const el = document.getElementById(`m-${id}`);
+  if(!el) return;
+  if(val && val.trim()){
+    el.textContent = val;
+    el.classList.remove('empty');
+  } else {
+    el.textContent = '...';
+    el.classList.add('empty');
+  }
+  // Pulse the parent section to show activity
+  const sec = el.closest('.mirror-section');
+  if(sec){ sec.classList.remove('mirror-pulse'); void sec.offsetWidth; sec.classList.add('mirror-pulse'); }
+}
+
+function mirrorEmotion(key){
+  const labels = {joy:'😄 Joy',sadness:'😢 Sadness',anger:'😠 Anger',fear:'😨 Fear',disgust:'🤢 Disgust',anxiety:'😰 Anxiety'};
+  mirrorUpdate('emotion', labels[key] || key);
+}
+
+function mirrorCoping(idx){
+  const skill = COPING[idx];
+  mirrorUpdate('coping', skill ? `${skill.emoji} ${skill.name}` : '');
+}
+
+function mirrorScenario(text){
+  mirrorUpdate('scenarioText', text);
+}
+
+function mirrorDistortion(text, on){
+  if(on) distortionsMirror.add(text);
+  else   distortionsMirror.delete(text);
+  const container = document.getElementById('m-distortions');
+  container.innerHTML = '';
+  if(distortionsMirror.size === 0){
+    container.innerHTML = '<span style="font-size:0.78rem;color:rgba(255,255,255,0.25);font-style:italic">None selected yet</span>';
+  } else {
+    distortionsMirror.forEach(d=>{
+      const chip = document.createElement('div');
+      chip.className = 'mirror-chip';
+      chip.textContent = d;
+      container.appendChild(chip);
+    });
+  }
+  const sec = container.closest('.mirror-section');
+  if(sec){ sec.classList.remove('mirror-pulse'); void sec.offsetWidth; sec.classList.add('mirror-pulse'); }
+}
+
+// ── Stars ─────────────────────────────────────────────────────
+(function(){
+  const bg=document.getElementById('starsBg');
+  for(let i=0;i<60;i++){
+    const s=document.createElement('div'); s.className='star-dot';
+    const sz=1+Math.random()*3;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s`;
+    bg.appendChild(s);
+  }
+})();
+
+// ── Emotion Data ──────────────────────────────────────────────
+const EMOTIONS = {
+  joy:     { emoji:'😄', color:'FFD700', brain:'Releases dopamine and serotonin. Broadens thinking and opens creativity.', say:'"I feel great!" · "This is amazing!" · "I want to share this!"', body:'Warm chest · Relaxed muscles · Smiling · Bouncy energy · Light feeling', response:'Savor it! Express gratitude, share with others, or use the energy creatively.', therapist:'Ask: "Where do you feel joy in your body? What does it feel like?" — help build body awareness around positive emotions.' },
+  sadness: { emoji:'😢', color:'4A90D9', brain:'Slows thinking to process loss. Signals need for comfort and support.', say:'"I miss them." · "I feel alone." · "Nothing feels good right now."', body:'Heavy chest · Tiredness · Tears · Slumped posture · Low energy', response:'Allow yourself to feel it. Reach out for comfort. Rest if needed. Talk to someone safe.', therapist:'Normalize sadness: "Sadness tells us something mattered to us." Ask what they might be grieving or missing.' },
+  anger:   { emoji:'😠', color:'E63946', brain:'Activates fight response. Adrenaline surges — signals something feels unfair or threatening.', say:'"That\'s not fair!" · "Stop!" · "I hate this!"', body:'Hot face · Tight jaw/fists · Fast heartbeat · Loud voice · Trembling', response:'Pause before acting. Take deep breaths. Name the feeling. Find a safe outlet like exercise.', therapist:'Explore the "hurt under the anger" — anger often protects sadness or fear. Ask: "What happened right before you got angry?"' },
+  fear:    { emoji:'😨', color:'9B5DE5', brain:'Activates fight/flight/freeze. Threat detection system on high alert.', say:'"What if something bad happens?" · "I can\'t do this." · "I might get hurt."', body:'Fast heartbeat · Sweaty palms · Frozen feeling · Shallow breathing · Wide eyes', response:'Ground yourself (5-4-3-2-1). Slow your breathing. Remind yourself you are safe right now.', therapist:'Help distinguish real vs. perceived danger. Ask: "What is the chance this will actually happen? What could you do if it did?"' },
+  disgust: { emoji:'🤢', color:'2DC653', brain:'Activates avoidance circuits. Protects from things that feel wrong or harmful.', say:'"Ew!" · "That\'s gross!" · "I don\'t want to be near that."', body:'Wrinkled nose · Unsettled stomach · Pulling away · Raised upper lip', response:'Notice what triggered it. Is it truly harmful or just unfamiliar? Explore the feeling with curiosity.', therapist:'Disgust is often linked to moral violations. Ask: "Does this remind you of a value being crossed? What matters to you here?"' },
+  anxiety: { emoji:'😰', color:'FF6B35', brain:'Anticipates future threat. Worries about "what if" scenarios. Overestimates danger.', say:'"What if I fail?" · "I can\'t stop worrying." · "Something bad will happen."', body:'Racing mind · Butterflies in stomach · Muscle tension · Trouble sleeping · Restlessness', response:'Identify the worry. Challenge the prediction. Use grounding. Remember: anxiety lies about how dangerous things are.', therapist:'Use the "worry vs. problem" framework. Ask: "Is this something you can take action on, or is it out of your control? What would you tell a friend who had this worry?"' }
+};
+
+function selectEmotion(key){
+  const e=EMOTIONS[key];
+  document.querySelectorAll('.emotion-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelector(`.emotion-card.${key}`).classList.add('selected');
+  document.getElementById('detailTitle').textContent=`${e.emoji} ${key.charAt(0).toUpperCase()+key.slice(1)}`;
+  document.getElementById('detailBrain').textContent=e.brain;
+  document.getElementById('detailSay').textContent=e.say;
+  document.getElementById('detailBody').textContent=e.body;
+  document.getElementById('detailResponse').textContent=e.response;
+  document.getElementById('emotionTherapistNote').innerHTML=`<strong>Therapist note:</strong> ${e.therapist}`;
+  document.getElementById('emotionDetail').classList.add('visible');
+  send({type:'emotionSelect',key});
+}
+
+// ── Coping Skills ──────────────────────────────────────────────
+const COPING = [
+  { emoji:'🌬️', name:'Deep Breathing', desc:'Slow the nervous system with intentional breath', color:'4A90D9', steps:['Sit comfortably and close your eyes if you like.','Breathe IN slowly through your nose for 4 counts.','Hold your breath gently for 4 counts.','Breathe OUT through your mouth for 6 counts.','Repeat 5 times. Notice your body relaxing.'] },
+  { emoji:'🖐️', name:'5-4-3-2-1 Grounding', desc:'Use your senses to return to the present moment', color:'2DC653', steps:['Name 5 things you can SEE around you.','Name 4 things you can TOUCH (feel them!).','Name 3 things you can HEAR right now.','Name 2 things you can SMELL (or like to smell).','Name 1 thing you can TASTE.'] },
+  { emoji:'💬', name:'Positive Self-Talk', desc:'Change the voice in your head to a helpful one', color:'FFD700', steps:['Notice the unhelpful thought ("I can\'t do this").','Ask: "What would I say to a friend?"','Replace with a kinder, true statement.','Say it out loud 3 times with your hand on your heart.','Example: "I am doing my best and that is enough."'] },
+  { emoji:'🤸', name:'Stretch & Move', desc:'Release emotion that is stuck in the body', color:'E63946', steps:['Stand up and shake out your hands and arms.','Roll your shoulders backward 5 times.','Reach your arms up high — stretch like a star!','Do 5 jumping jacks or march in place.','Take 3 deep breaths and notice how you feel.'] },
+  { emoji:'🎨', name:'Creative Expression', desc:'Put feelings into art, writing, or music', color:'9B5DE5', steps:['Choose your tool: drawing, writing, humming, or movement.','Set a 3-minute timer.','Express the emotion WITHOUT words if possible.','When done, ask: "What did I create? What does it show?"','Share one thing about it if you feel comfortable.'] },
+  { emoji:'🧊', name:'Temperature Reset', desc:'A cool sensation can interrupt overwhelming feelings', color:'00B4D8', steps:['Hold an ice cube or run cold water on your wrists.','Focus entirely on the sensation — describe it in your mind.','Take a slow breath while feeling the cold.','Notice how it interrupts the overwhelming feeling.','Use this when emotions feel "too big" and urgent.'] }
+];
+
+function buildCopingGrid(){
+  const grid=document.getElementById('copingGrid');
+  COPING.forEach((skill,i)=>{
+    const card=document.createElement('div');
+    card.className='coping-card'; card.id=`coping-${i}`;
+    const stepsHtml=skill.steps.map((s,j)=>`<div class="coping-step"><span class="step-num">${j+1}.</span><span>${s}</span></div>`).join('');
+    card.innerHTML=`<div class="coping-emoji">${skill.emoji}</div><div class="coping-name">${skill.name}</div><div class="coping-desc">${skill.desc}</div><div class="coping-steps" id="coping-steps-${i}">${stepsHtml}</div>`;
+    card.style.borderTopColor=`#${skill.color}`;
+    card.onclick=()=>toggleCoping(i);
+    grid.appendChild(card);
+  });
+}
+
+function toggleCoping(i){
+  const card=document.getElementById(`coping-${i}`);
+  const steps=document.getElementById(`coping-steps-${i}`);
+  const wasActive=card.classList.contains('active-skill');
+  document.querySelectorAll('.coping-card').forEach(c=>c.classList.remove('active-skill'));
+  document.querySelectorAll('.coping-steps').forEach(s=>s.classList.remove('visible'));
+  if(!wasActive){ card.classList.add('active-skill'); steps.classList.add('visible'); }
+  send({type:'copingToggle',idx:i,open:!wasActive});
+}
+
+// ── Scenarios ──────────────────────────────────────────────────
+const SCENARIOS = {
+  joy:    ["Alex just got the best grade they've ever received on a test. Their best friend didn't do as well and seems upset.","Jordan's team won the big game! But one teammate tripped and got injured during the win.","Riley got the lead role in the school play — something they'd been dreaming about. But their best friend also auditioned and didn't get a part."],
+  sadness:["Sam's dog passed away after being sick for a long time. Everyone at school is acting normal and doesn't know.","Morgan had to move to a new city and leave all their friends behind. Today is the first day at a new school.","Jamie's parents told them they won't be able to go on the class trip because of money. Their friends are all excited about it."],
+  anger:  ["Tyler worked really hard on a group project, but their partner didn't do their part. The teacher gave the whole group a low grade.","A kid at school keeps taking Casey's lunch spot and making rude comments. Casey feels like they can't say anything.","Drew's sibling broke Drew's favorite belonging and their parents didn't seem to think it was a big deal."],
+  fear:   ["Alex has to give a big presentation tomorrow in front of the whole class. They keep imagining everything going wrong.","Jordan is about to try out for the sports team. What if they make a mistake and everyone laughs?","Sam has to go to the doctor for the first time at a new office. They don't know what to expect."],
+  disgust:["Morgan's friends want to do something that doesn't feel right — it might hurt someone's feelings. Everyone is pressuring Morgan.","A classmate is being really mean to a younger student. Casey watches from across the room and doesn't know what to do.","Jamie found out that someone shared a private secret of theirs with the whole group without permission."]
+};
+
+let currentScenarioEmo='';
+function filterScenario(emo){
+  currentScenarioEmo=emo;
+  document.querySelectorAll('.scenario-emo-btn').forEach(b=>b.classList.remove('active-emo'));
+  document.querySelector(`.scenario-emo-btn.${emo}`).classList.add('active-emo');
+  const pool=SCENARIOS[emo];
+  const s=pool[Math.floor(Math.random()*pool.length)];
+  showScenario(emo,s);
+  send({type:'scenario',emo,text:s});
+}
+function randomScenario(){
+  const emos=Object.keys(SCENARIOS);
+  const emo=emos[Math.floor(Math.random()*emos.length)];
+  filterScenario(emo);
+}
+function showScenario(emo,text){
+  const labels={joy:'Joy Scenario',sadness:'Sadness Scenario',anger:'Anger Scenario',fear:'Fear Scenario',disgust:'Disgust Scenario'};
+  document.getElementById('scenarioEmotionLabel').textContent=labels[emo]||'Scenario';
+  document.getElementById('scenarioText').textContent=text;
+  document.querySelectorAll('.scenario-emo-btn').forEach(b=>b.classList.remove('active-emo'));
+  const btn=document.querySelector(`.scenario-emo-btn.${emo}`);
+  if(btn) btn.classList.add('active-emo');
+}
+
+// ── CBT Distortions ────────────────────────────────────────────
+const DISTORTIONS=[
+  'All-or-Nothing Thinking','Catastrophizing','Mind Reading','Fortune Telling',
+  'Overgeneralization','Emotional Reasoning','Should Statements','Personalization',
+  'Filtering','Jumping to Conclusions','Labeling','Magnification'
+];
+function buildDistortionChips(){
+  const container=document.getElementById('distortionChips');
+  DISTORTIONS.forEach(d=>{
+    const chip=document.createElement('div'); chip.className='d-chip'; chip.textContent=d;
+    chip.onclick=()=>{ chip.classList.toggle('picked'); send({type:'distortion',text:d,on:chip.classList.contains('picked')}); };
+    container.appendChild(chip);
+  });
+}
+
+// ── Section management ──────────────────────────────────────────
+const SECTIONS=['emotion','coping','scenario','cbt','debrief'];
+let completedSections=new Set();
+let currentSection='emotion';
+
+function switchSection(sec){
+  document.querySelectorAll('.section-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sec-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(`panel-${sec}`).classList.add('active');
+  document.querySelector(`[data-sec="${sec}"]`).classList.add('active');
+  currentSection=sec;
+  send({type:'switchSection',sec});
+}
+
+function completeSection(sec){
+  completedSections.add(sec);
+  document.getElementById(`${sec}Complete`).classList.add('show');
+  document.getElementById(`stamp-${sec}`).classList.add('earned');
+  updateProgress();
+  if(sec==='debrief') spawnConfetti();
+  send({type:'completeSection',sec});
+}
+
+function updateProgress(){
+  const n=completedSections.size;
+  document.getElementById('progressFill').style.width=`${(n/5)*100}%`;
+  document.getElementById('progressText').textContent=`${n}/5`;
+  if(n===5) document.getElementById('passportMsg').textContent='🎉 All stamps earned! Outstanding session!';
+  else document.getElementById('passportMsg').textContent=`${n} of 5 stamps earned — keep going!`;
+}
+
+// ── Text field sync ─────────────────────────────────────────────
+function syncField(id,val){ send({type:'field',id,val}); }
+
+// ── Multiplayer ──────────────────────────────────────────────────
+let peer=null,conn=null,isHost=false,myPlayer=1;
+
+function genCode(){
+  const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s=''; for(let i=0;i<6;i++) s+=c[Math.floor(Math.random()*c.length)]; return s;
+}
+function setConn(color,msg){
+  document.getElementById('connDot').className='dot '+color;
+  document.getElementById('connText').textContent=msg;
+}
+function send(msg){ if(conn&&conn.open){ try{conn.send(msg);}catch(e){} } }
+
+function handleMsg(msg){
+  switch(msg.type){
+    case 'name': document.getElementById(msg.id).value=msg.name; break;
+    case 'switchSection': switchSection(msg.sec); break;
+    case 'completeSection': completedSections.add(msg.sec); document.getElementById(`${msg.sec}Complete`).classList.add('show'); document.getElementById(`stamp-${msg.sec}`).classList.add('earned'); updateProgress(); if(msg.sec==='debrief') spawnConfetti(); break;
+    case 'emotionSelect':
+      selectEmotion(msg.key);
+      if(isHost) mirrorEmotion(msg.key);
+      break;
+    case 'copingToggle':
+      const card=document.getElementById(`coping-${msg.idx}`),steps=document.getElementById(`coping-steps-${msg.idx}`);
+      document.querySelectorAll('.coping-card').forEach(c=>c.classList.remove('active-skill'));
+      document.querySelectorAll('.coping-steps').forEach(s=>s.classList.remove('visible'));
+      if(msg.open){card.classList.add('active-skill');steps.classList.add('visible');}
+      if(isHost && msg.open) mirrorCoping(msg.idx);
+      if(isHost && !msg.open) mirrorUpdate('coping','');
+      break;
+    case 'scenario':
+      showScenario(msg.emo,msg.text);
+      if(isHost) mirrorScenario(msg.text);
+      break;
+    case 'field':
+      { const el=document.getElementById(msg.id); if(el&&document.activeElement!==el) el.value=msg.val; }
+      if(isHost) mirrorUpdate(msg.id, msg.val);
+      break;
+    case 'distortion':
+      { const chips=document.querySelectorAll('.d-chip'); chips.forEach(c=>{ if(c.textContent===msg.text){ if(msg.on) c.classList.add('picked'); else c.classList.remove('picked'); } }); }
+      if(isHost) mirrorDistortion(msg.text, msg.on);
+      break;
+  }
+}
+
+function setupConn(){
+  conn.on('open',()=>{
+    if(!isHost){
+      setConn('green','✅ Connected to therapist!');
+      send({type:'name',id:'otherName',name:document.getElementById('myName').value});
+    } else {
+      setConn('green','✅ Client connected!');
+      document.getElementById('otherName').value='Client';
+      send({type:'name',id:'otherName',name:'Therapist'});
+      mirrorClientConnected();
+    }
+  });
+  conn.on('data',handleMsg);
+  conn.on('close',()=>setConn('red','Disconnected.'));
+  conn.on('error',()=>setConn('red','Connection error.'));
+}
+
+function onNameChange(){
+  const val=document.getElementById('myName').value;
+  const id=isHost?'myName':'otherName';
+  send({type:'name',id,name:val});
+}
+function onOtherNameChange(){
+  if(!isHost) return;
+  send({type:'name',id:'otherName',name:document.getElementById('otherName').value});
+}
+
+function initNetwork(){
+  const params=new URLSearchParams(window.location.search);
+  const code=params.get('game');
+  if(!code){
+    isHost=true;
+    document.getElementById('myRoleLabel').textContent='Therapist';
+    document.getElementById('myRoleIcon').textContent='🪄';
+    document.getElementById('myRoleSub').textContent='Leading the session';
+    document.getElementById('otherRoleIcon').textContent='⭐';
+    document.getElementById('myName').value='Therapist';
+    document.getElementById('otherName').value='Waiting...';
+    const rc=genCode();
+    const url=window.location.href.split('?')[0]+'?game='+rc;
+    document.getElementById('shareUrl').textContent=url;
+    setConn('orange','Waiting for client to join...');
+    peer=new Peer('io-'+rc,{debug:0});
+    peer.on('open',()=>setConn('orange','Ready! Share the link with your client.'));
+    peer.on('connection',c=>{conn=c;setupConn();});
+    peer.on('error',e=>setConn('red','Network error: '+e.type));
+    showMirrorForHost();
+  } else {
+    isHost=false;
+    document.getElementById('myRoleLabel').textContent='Client';
+    document.getElementById('myRoleIcon').textContent='⭐';
+    document.getElementById('myRoleSub').textContent='Exploring emotions';
+    document.getElementById('myName').value='Client';
+    document.getElementById('myRoleBadge').style.background='#4A90D9';
+    document.getElementById('otherRoleIcon').textContent='🪄';
+    document.getElementById('otherRoleLabel').textContent='Therapist';
+    document.body.classList.add('is-client');
+    const url=window.location.href.split('?')[0]+'?game='+code;
+    document.getElementById('shareUrl').textContent=url;
+    setConn('orange','Connecting to therapist...');
+    peer=new Peer({debug:0});
+    peer.on('open',()=>{conn=peer.connect('io-'+code,{reliable:true});setupConn();});
+    peer.on('error',()=>setConn('red','Could not connect. Ask therapist to resend the link.'));
+  }
+}
+
+function copyLink(){
+  const url=document.getElementById('shareUrl').textContent;
+  const btn=document.getElementById('copyBtn');
+  const ok=()=>{btn.textContent='✅ Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='📋 Copy';btn.classList.remove('copied');},2200);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(ok).catch(()=>fbCopy(url,ok));}
+  else{fbCopy(url,ok);}
+}
+function fbCopy(t,cb){const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');cb();}catch(e){}document.body.removeChild(ta);}
+
+function spawnConfetti(){
+  const cols=['FFD700','4A90D9','E63946','9B5DE5','2DC653','FF6B35'];
+  for(let i=0;i<100;i++){
+    const el=document.createElement('div');el.className='conf-p';
+    const sz=6+Math.random()*10;
+    el.style.cssText=`left:${Math.random()*100}vw;top:-16px;width:${sz}px;height:${sz}px;background:#${cols[Math.floor(Math.random()*cols.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()}s`;
+    document.body.appendChild(el);el.addEventListener('animationend',()=>el.remove());
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────
+buildCopingGrid();
+buildDistortionChips();
+initNetwork();
+</script>
+</body>
+</html>
