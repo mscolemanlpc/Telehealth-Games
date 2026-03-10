@@ -866,7 +866,7 @@ const EMOTIONS = {
   anxiety: { emoji:'😰', color:'FF6B35', brain:'Anticipates future threat. Worries about "what if" scenarios. Overestimates danger.', say:'"What if I fail?" · "I can\'t stop worrying." · "Something bad will happen."', body:'Racing mind · Butterflies in stomach · Muscle tension · Trouble sleeping · Restlessness', response:'Identify the worry. Challenge the prediction. Use grounding. Remember: anxiety lies about how dangerous things are.', therapist:'Use the "worry vs. problem" framework. Ask: "Is this something you can take action on, or is it out of your control? What would you tell a friend who had this worry?"' }
 };
 
-function selectEmotion(key){
+function selectEmotion(key, broadcast=true){
   const e=EMOTIONS[key];
   document.querySelectorAll('.emotion-card').forEach(c=>c.classList.remove('selected'));
   document.querySelector(`.emotion-card.${key}`).classList.add('selected');
@@ -877,7 +877,7 @@ function selectEmotion(key){
   document.getElementById('detailResponse').textContent=e.response;
   document.getElementById('emotionTherapistNote').innerHTML=`<strong>Therapist note:</strong> ${e.therapist}`;
   document.getElementById('emotionDetail').classList.add('visible');
-  send({type:'emotionSelect',key});
+  if(broadcast) send({type:'emotionSelect',key});
 }
 
 // ── Coping Skills ──────────────────────────────────────────────
@@ -903,14 +903,14 @@ function buildCopingGrid(){
   });
 }
 
-function toggleCoping(i){
+function toggleCoping(i, broadcast=true){
   const card=document.getElementById(`coping-${i}`);
   const steps=document.getElementById(`coping-steps-${i}`);
   const wasActive=card.classList.contains('active-skill');
   document.querySelectorAll('.coping-card').forEach(c=>c.classList.remove('active-skill'));
   document.querySelectorAll('.coping-steps').forEach(s=>s.classList.remove('visible'));
   if(!wasActive){ card.classList.add('active-skill'); steps.classList.add('visible'); }
-  send({type:'copingToggle',idx:i,open:!wasActive});
+  if(broadcast) send({type:'copingToggle',idx:i,open:!wasActive});
 }
 
 // ── Scenarios ──────────────────────────────────────────────────
@@ -929,7 +929,7 @@ function filterScenario(emo){
   document.querySelector(`.scenario-emo-btn.${emo}`).classList.add('active-emo');
   const pool=SCENARIOS[emo];
   const s=pool[Math.floor(Math.random()*pool.length)];
-  showScenario(emo,s);
+  showScenario(emo,s,false);
   send({type:'scenario',emo,text:s});
 }
 function randomScenario(){
@@ -937,13 +937,14 @@ function randomScenario(){
   const emo=emos[Math.floor(Math.random()*emos.length)];
   filterScenario(emo);
 }
-function showScenario(emo,text){
+function showScenario(emo,text, broadcast=true){
   const labels={joy:'Joy Scenario',sadness:'Sadness Scenario',anger:'Anger Scenario',fear:'Fear Scenario',disgust:'Disgust Scenario'};
   document.getElementById('scenarioEmotionLabel').textContent=labels[emo]||'Scenario';
   document.getElementById('scenarioText').textContent=text;
   document.querySelectorAll('.scenario-emo-btn').forEach(b=>b.classList.remove('active-emo'));
   const btn=document.querySelector(`.scenario-emo-btn.${emo}`);
   if(btn) btn.classList.add('active-emo');
+  if(broadcast) send({type:'scenario',emo,text});
 }
 
 // ── CBT Distortions ────────────────────────────────────────────
@@ -966,22 +967,22 @@ const SECTIONS=['emotion','coping','scenario','cbt','debrief'];
 let completedSections=new Set();
 let currentSection='emotion';
 
-function switchSection(sec){
+function switchSection(sec, broadcast=true){
   document.querySelectorAll('.section-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sec-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(`panel-${sec}`).classList.add('active');
   document.querySelector(`[data-sec="${sec}"]`).classList.add('active');
   currentSection=sec;
-  send({type:'switchSection',sec});
+  if(broadcast) send({type:'switchSection',sec});
 }
 
-function completeSection(sec){
+function completeSection(sec, broadcast=true){
   completedSections.add(sec);
   document.getElementById(`${sec}Complete`).classList.add('show');
   document.getElementById(`stamp-${sec}`).classList.add('earned');
   updateProgress();
   if(sec==='debrief') spawnConfetti();
-  send({type:'completeSection',sec});
+  if(broadcast) send({type:'completeSection',sec});
 }
 
 function updateProgress(){
@@ -1015,22 +1016,26 @@ function send(msg){ if(conn&&conn.open){ try{conn.send(msg);}catch(e){} } }
 function handleMsg(msg){
   switch(msg.type){
     case 'name': document.getElementById(msg.id).value=msg.name; break;
-    case 'switchSection': switchSection(msg.sec); break;
-    case 'completeSection': completedSections.add(msg.sec); document.getElementById(`${msg.sec}Complete`).classList.add('show'); document.getElementById(`stamp-${msg.sec}`).classList.add('earned'); updateProgress(); if(msg.sec==='debrief') spawnConfetti(); break;
+    case 'switchSection': switchSection(msg.sec, false); break;
+    case 'completeSection':
+      completedSections.add(msg.sec);
+      document.getElementById(`${msg.sec}Complete`).classList.add('show');
+      document.getElementById(`stamp-${msg.sec}`).classList.add('earned');
+      updateProgress();
+      if(msg.sec==='debrief') spawnConfetti();
+      break;
     case 'emotionSelect':
-      selectEmotion(msg.key);
+      selectEmotion(msg.key, false);
       if(isHost) mirrorEmotion(msg.key);
       break;
     case 'copingToggle':
-      const card=document.getElementById(`coping-${msg.idx}`),steps=document.getElementById(`coping-steps-${msg.idx}`);
-      document.querySelectorAll('.coping-card').forEach(c=>c.classList.remove('active-skill'));
-      document.querySelectorAll('.coping-steps').forEach(s=>s.classList.remove('visible'));
-      if(msg.open){card.classList.add('active-skill');steps.classList.add('visible');}
-      if(isHost && msg.open) mirrorCoping(msg.idx);
-      if(isHost && !msg.open) mirrorUpdate('coping','');
+      { toggleCoping(msg.idx, false);
+        if(isHost && msg.open) mirrorCoping(msg.idx);
+        if(isHost && !msg.open) mirrorUpdate('coping','');
+      }
       break;
     case 'scenario':
-      showScenario(msg.emo,msg.text);
+      showScenario(msg.emo, msg.text, false);
       if(isHost) mirrorScenario(msg.text);
       break;
     case 'field':
@@ -1044,8 +1049,10 @@ function handleMsg(msg){
       if(isHost) mirrorUpdate(msg.id, msg.val);
       break;
     case 'distortion':
-      { const chips=document.querySelectorAll('.d-chip'); chips.forEach(c=>{ if(c.textContent===msg.text){ if(msg.on) c.classList.add('picked'); else c.classList.remove('picked'); } }); }
-      if(isHost) mirrorDistortion(msg.text, msg.on);
+      { const chips=document.querySelectorAll('.d-chip');
+        chips.forEach(c=>{ if(c.textContent===msg.text){ if(msg.on) c.classList.add('picked'); else c.classList.remove('picked'); } });
+        if(isHost) mirrorDistortion(msg.text, msg.on);
+      }
       break;
   }
 }
@@ -1069,8 +1076,9 @@ function setupConn(){
 
 function onNameChange(){
   const val=document.getElementById('myName').value;
-  const id=isHost?'myName':'otherName';
-  send({type:'name',id,name:val});
+  // Host typing their name → update 'otherName' on client's screen
+  // Client typing their name → update 'otherName' on host's screen
+  send({type:'name',id:'otherName',name:val});
 }
 function onOtherNameChange(){
   if(!isHost) return;
