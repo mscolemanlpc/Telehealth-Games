@@ -993,7 +993,11 @@ function updateProgress(){
 }
 
 // ── Text field sync ─────────────────────────────────────────────
-function syncField(id,val){ send({type:'field',id,val}); }
+const syncTimers={};
+function syncField(id,val){
+  clearTimeout(syncTimers[id]);
+  syncTimers[id]=setTimeout(()=>send({type:'field',id,val}),120);
+}
 
 // ── Multiplayer ──────────────────────────────────────────────────
 let peer=null,conn=null,isHost=false,myPlayer=1;
@@ -1030,7 +1034,13 @@ function handleMsg(msg){
       if(isHost) mirrorScenario(msg.text);
       break;
     case 'field':
-      { const el=document.getElementById(msg.id); if(el&&document.activeElement!==el) el.value=msg.val; }
+      { const el=document.getElementById(msg.id);
+        if(el && document.activeElement!==el){
+          const prev=el.oninput; el.oninput=null;
+          el.value=msg.val;
+          el.oninput=prev;
+        }
+      }
       if(isHost) mirrorUpdate(msg.id, msg.val);
       break;
     case 'distortion':
