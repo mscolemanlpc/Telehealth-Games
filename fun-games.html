@@ -7,238 +7,89 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
 <style>
-:root {
-  --sun: #FFD93D;
-  --coral: #FF6B6B;
-  --sky: #4D96FF;
-  --mint: #6BCB77;
-  --purple: #C77DFF;
-  --bg1: #fff9f0;
-  --bg2: #f0f6ff;
-  --card: #ffffff;
-  --text: #2a2a4a;
-  --muted: #7a7a9a;
-  --shadow: 0 8px 32px rgba(80,80,160,0.10);
-  --radius: 20px;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 116%; }
-body {
-  font-family: 'Nunito', sans-serif;
-  background: linear-gradient(135deg, #fff9f0 0%, #f0f6ff 50%, #f9f0ff 100%);
-  min-height: 100vh;
-  color: var(--text);
-}
-
-/* ─── FLOATING SHAPES ─── */
-.shapes { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
-.shape { position:absolute; border-radius:50%; opacity:0.13; animation: floaty 8s ease-in-out infinite; }
-.s1 { width:180px;height:180px;background:var(--sun);top:5%;left:8%;animation-delay:0s; }
-.s2 { width:120px;height:120px;background:var(--coral);top:20%;right:6%;animation-delay:1.5s; }
-.s3 { width:90px;height:90px;background:var(--sky);bottom:15%;left:5%;animation-delay:3s; }
-.s4 { width:150px;height:150px;background:var(--mint);bottom:10%;right:10%;animation-delay:4.5s; }
-.s5 { width:70px;height:70px;background:var(--purple);top:50%;left:50%;animation-delay:2s; }
-@keyframes floaty {
-  0%,100%{transform:translateY(0) scale(1);}
-  50%{transform:translateY(-22px) scale(1.06);}
-}
-
-/* ─── LAYOUT ─── */
-#app {
-  position: relative; z-index: 1;
-  max-width: 860px; margin: 0 auto;
-  padding: 24px 18px 40px;
-  display: flex; flex-direction: column; align-items: center; gap: 18px;
-}
-
-/* ─── HEADER ─── */
-header { text-align:center; width:100%; }
-.game-title {
-  font-family: 'Fredoka One', cursive;
-  font-size: 2.4rem; color: var(--text);
-  letter-spacing: 0.5px;
-}
-.game-title span { color: var(--coral); }
-.game-sub { font-size:0.88rem; color:var(--muted); font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-top:2px; }
-
-/* ─── CARD ─── */
-.card {
-  background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 18px 22px;
-  width: 100%;
-}
-
-/* ─── SHARE BAR ─── */
-.share-label { font-size:0.78rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
-.share-row { display:flex; align-items:center; gap:10px; }
-.share-url {
-  flex:1; background:#f4f4fc; border-radius:10px;
-  padding:9px 14px; font-size:0.78rem; font-weight:700;
-  color:var(--text); word-break:break-all; border:2px solid #e8e8f0;
-}
-.copy-btn {
-  background: var(--sky); color:#fff; border:none; border-radius:10px;
-  padding:9px 16px; font-family:'Nunito',sans-serif; font-weight:800;
-  font-size:0.82rem; cursor:pointer; transition:all .2s; white-space:nowrap;
-}
-.copy-btn:hover { transform:scale(1.05); background:#2255d4; }
-.copy-btn.copied { background:var(--mint); }
-.conn-row { margin-top:8px; display:flex; align-items:center; gap:8px; font-size:0.82rem; font-weight:700; color:var(--muted); }
-.dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; transition:background .4s; }
-.dot.orange { background:#ffa500; box-shadow:0 0 6px #ffa500aa; }
-.dot.green  { background:var(--mint); box-shadow:0 0 6px #6bcb77aa; }
-.dot.red    { background:var(--coral); }
-
-/* ─── PLAYERS ─── */
-.players-row { display:flex; gap:14px; width:100%; }
-.player-card {
-  flex:1; background:var(--card); border-radius:16px;
-  padding:14px 16px; box-shadow:var(--shadow);
-  border:3px solid transparent; transition:border .3s;
-  position:relative;
-}
-.player-card.p1-card { border-color:#ffb3b3; }
-.player-card.p2-card { border-color:#b3d4ff; }
-.player-card.active-turn { box-shadow:0 0 0 3px var(--sun), var(--shadow); animation:pulse-card 1.2s ease-in-out infinite; }
-@keyframes pulse-card { 0%,100%{box-shadow:0 0 0 3px var(--sun),var(--shadow);} 50%{box-shadow:0 0 0 6px #ffd93d88,var(--shadow);} }
-.player-label { font-size:0.72rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
-.player-name-input {
-  font-family:'Fredoka One',cursive; font-size:1.25rem;
-  border:none; outline:none; background:transparent; width:100%;
-  color:var(--text); margin-top:2px;
-}
-.player-piece { font-size:1.6rem; margin-top:4px; }
-.you-badge {
-  position:absolute; top:-10px; right:10px;
-  background:var(--sun); color:#7a5200; font-size:0.65rem;
-  font-weight:900; padding:2px 8px; border-radius:20px;
-  letter-spacing:1px; text-transform:uppercase;
-}
-.score-display { font-size:0.78rem; font-weight:800; color:var(--muted); margin-top:4px; }
-.score-num { font-family:'Fredoka One',cursive; font-size:1.1rem; color:var(--text); }
-
-/* ─── GAME SELECTOR ─── */
-.game-selector { display:flex; gap:12px; width:100%; }
-.game-tab {
-  flex:1; padding:14px; border-radius:14px; border:3px solid #e8e8f0;
-  background:#fafaff; font-family:'Fredoka One',cursive; font-size:1.1rem;
-  cursor:pointer; transition:all .2s; text-align:center; color:var(--muted);
-}
-.game-tab:hover { border-color:var(--sky); color:var(--text); }
-.game-tab.active { border-color:var(--sky); background:linear-gradient(135deg,#e8f2ff,#f0e8ff); color:var(--text); box-shadow:var(--shadow); }
-.game-tab .tab-emoji { font-size:1.8rem; display:block; margin-bottom:4px; }
-
-/* ─── TURN BANNER ─── */
-.turn-banner {
-  width:100%; text-align:center;
-  font-family:'Fredoka One',cursive; font-size:1.15rem;
-  padding:10px; border-radius:12px;
-  background:linear-gradient(135deg,#fff9e8,#fff3d0);
-  color:#7a5200; border:2px solid #ffd93d;
-}
-
-/* ─── TIC TAC TOE ─── */
-#ttt-panel { width:100%; }
-.ttt-board {
-  display:grid; grid-template-columns:repeat(3,1fr);
-  gap:10px; max-width:320px; margin:0 auto;
-}
-.ttt-cell {
-  aspect-ratio:1; background:#f4f4fc; border-radius:14px;
-  border:3px solid #e0e0f0; font-size:2.8rem;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; transition:all .2s; font-family:'Fredoka One',cursive;
-  user-select:none;
-}
-.ttt-cell:hover:not(.taken) { background:#e8f2ff; border-color:var(--sky); transform:scale(1.04); }
-.ttt-cell.taken { cursor:default; }
-.ttt-cell.x-cell { color:var(--coral); }
-.ttt-cell.o-cell { color:var(--sky); }
-.ttt-cell.win-cell { background:linear-gradient(135deg,#fffbe8,#fff3c0); border-color:var(--sun); animation:win-pop .4s ease; }
-@keyframes win-pop { 0%{transform:scale(0.9)} 60%{transform:scale(1.12)} 100%{transform:scale(1)} }
-
-/* ─── CHECKERS ─── */
-#checkers-panel { width:100%; }
-.checkers-board-wrap { display:flex; justify-content:center; }
-.checkers-board {
-  display:grid; grid-template-columns:repeat(8,1fr);
-  border:4px solid #c0c0d8; border-radius:12px; overflow:hidden;
-  max-width:420px; width:100%; box-shadow:var(--shadow);
-}
-.checkers-cell {
-  aspect-ratio:1; display:flex; align-items:center; justify-content:center;
-  cursor:pointer; transition:all .15s; position:relative;
-}
-.checkers-cell.light { background:#f5f0e8; }
-.checkers-cell.dark  { background:#8b7355; }
-.checkers-cell.dark:hover.playable { background:#a08b6a; }
-.checkers-cell.selected { background:#ffd700 !important; }
-.checkers-cell.can-move { background:#90ee90 !important; }
-.checker {
-  width:72%; height:72%; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  font-size:1.1rem; font-weight:900; transition:all .2s;
-  border:3px solid rgba(0,0,0,0.18); cursor:pointer;
-  box-shadow:0 3px 6px rgba(0,0,0,0.2);
-  user-select:none; pointer-events:none;
-}
-.checker.p1 { background:linear-gradient(135deg,#ff8080,#ff4444); color:#fff; }
-.checker.p2 { background:linear-gradient(135deg,#6699ff,#2255cc); color:#fff; }
-.checker.king::after { content:'👑'; font-size:0.8rem; position:absolute; }
-.checker.p1:hover { transform:scale(1.1); }
-.checker.p2:hover { transform:scale(1.1); }
-
-/* ─── ACTION BTNS ─── */
-.btn-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; justify-content:center; }
-.action-btn {
-  padding:10px 22px; border:none; border-radius:12px;
-  font-family:'Nunito',sans-serif; font-weight:800; font-size:0.9rem;
-  cursor:pointer; transition:all .2s;
-}
-.btn-new { background:linear-gradient(135deg,var(--sky),#7b2fff); color:#fff; }
-.btn-new:hover { transform:scale(1.04); }
-.btn-reset { background:#f4f4fc; color:var(--muted); border:2px solid #e0e0f0; }
-.btn-reset:hover { background:#e8e8f8; }
-
-/* ─── WIN OVERLAY ─── */
-.win-overlay {
-  display:none; position:fixed; inset:0; z-index:100;
-  background:rgba(30,20,60,0.7); backdrop-filter:blur(4px);
-  align-items:center; justify-content:center;
-}
-.win-overlay.show { display:flex; }
-.win-card {
-  background:#fff; border-radius:28px; padding:40px 48px;
-  text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3);
-  animation:pop-in .4s cubic-bezier(.34,1.56,.64,1);
-}
-@keyframes pop-in { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
-.win-emoji { font-size:4rem; margin-bottom:10px; }
-.win-text { font-family:'Fredoka One',cursive; font-size:2rem; color:var(--text); margin-bottom:6px; }
-.win-sub { color:var(--muted); font-size:1rem; font-weight:700; margin-bottom:20px; }
-.btn-play-again {
-  background:linear-gradient(135deg,var(--coral),var(--purple));
-  color:#fff; border:none; border-radius:14px;
-  padding:14px 32px; font-family:'Nunito',sans-serif;
-  font-weight:800; font-size:1rem; cursor:pointer; transition:all .2s;
-}
-.btn-play-again:hover { transform:scale(1.05); }
-
-/* ─── CONFETTI ─── */
-.confetti-piece {
-  position:fixed; width:10px; height:10px;
-  border-radius:2px; opacity:0; z-index:200; pointer-events:none;
-  animation:conf-fall 2s ease-out forwards;
-}
-@keyframes conf-fall {
-  0%{opacity:1;transform:translateY(-20px) rotate(0deg);}
-  100%{opacity:0;transform:translateY(100vh) rotate(720deg);}
-}
-
-/* ─── FOOTER ─── */
-footer { text-align:center; font-size:0.72rem; color:var(--muted); font-weight:700; padding-top:4px; }
+:root{--sun:#FFD93D;--coral:#FF6B6B;--sky:#4D96FF;--mint:#6BCB77;--purple:#C77DFF;--card:#ffffff;--text:#2a2a4a;--muted:#7a7a9a;--shadow:0 8px 32px rgba(80,80,160,0.10);--radius:20px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:116%;}
+body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#fff9f0 0%,#f0f6ff 50%,#f9f0ff 100%);min-height:100vh;color:var(--text);}
+.shapes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.shape{position:absolute;border-radius:50%;opacity:0.13;animation:floaty 8s ease-in-out infinite;}
+.s1{width:180px;height:180px;background:var(--sun);top:5%;left:8%;}
+.s2{width:120px;height:120px;background:var(--coral);top:20%;right:6%;animation-delay:1.5s;}
+.s3{width:90px;height:90px;background:var(--sky);bottom:15%;left:5%;animation-delay:3s;}
+.s4{width:150px;height:150px;background:var(--mint);bottom:10%;right:10%;animation-delay:4.5s;}
+.s5{width:70px;height:70px;background:var(--purple);top:50%;left:50%;animation-delay:2s;}
+@keyframes floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-22px);}}
+#app{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:24px 18px 40px;display:flex;flex-direction:column;align-items:center;gap:18px;}
+header{text-align:center;width:100%;}
+.game-title{font-family:'Fredoka One',cursive;font-size:2.4rem;color:var(--text);}
+.game-title span{color:var(--coral);}
+.game-sub{font-size:0.88rem;color:var(--muted);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px;width:100%;}
+.share-label{font-size:0.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.share-row{display:flex;align-items:center;gap:10px;}
+.share-url{flex:1;background:#f4f4fc;border-radius:10px;padding:9px 14px;font-size:0.78rem;font-weight:700;color:var(--text);word-break:break-all;border:2px solid #e8e8f0;}
+.copy-btn{background:var(--sky);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.82rem;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.copy-btn:hover{transform:scale(1.05);}
+.copy-btn.copied{background:var(--mint);}
+.conn-row{margin-top:8px;display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:700;color:var(--muted);}
+.dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.dot.orange{background:#ffa500;box-shadow:0 0 6px #ffa500aa;}
+.dot.green{background:var(--mint);box-shadow:0 0 6px #6bcb77aa;}
+.dot.red{background:var(--coral);}
+.players-row{display:flex;gap:14px;width:100%;}
+.player-card{flex:1;background:var(--card);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow);border:3px solid transparent;transition:all .3s;position:relative;}
+.player-card.p1-card{border-color:#ffb3b3;}
+.player-card.p2-card{border-color:#b3d4ff;}
+.player-card.active-turn{box-shadow:0 0 0 4px var(--sun),var(--shadow);}
+.player-label{font-size:0.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.player-name-input{font-family:'Fredoka One',cursive;font-size:1.25rem;border:none;outline:none;background:transparent;width:100%;color:var(--text);margin-top:2px;}
+.player-piece{font-size:1.6rem;margin-top:4px;}
+.you-badge{position:absolute;top:-10px;right:10px;background:var(--sun);color:#7a5200;font-size:0.65rem;font-weight:900;padding:2px 8px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;}
+.score-display{font-size:0.78rem;font-weight:800;color:var(--muted);margin-top:4px;}
+.score-num{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--text);}
+.game-selector{display:flex;gap:12px;width:100%;}
+.game-tab{flex:1;padding:14px;border-radius:14px;border:3px solid #e8e8f0;background:#fafaff;font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;text-align:center;color:var(--muted);}
+.game-tab:hover{border-color:var(--sky);color:var(--text);}
+.game-tab.active{border-color:var(--sky);background:linear-gradient(135deg,#e8f2ff,#f0e8ff);color:var(--text);box-shadow:var(--shadow);}
+.tab-emoji{font-size:1.8rem;display:block;margin-bottom:4px;}
+.turn-banner{width:100%;text-align:center;font-family:'Fredoka One',cursive;font-size:1.15rem;padding:10px;border-radius:12px;background:linear-gradient(135deg,#fff9e8,#fff3d0);color:#7a5200;border:2px solid #ffd93d;}
+/* TTT */
+.ttt-board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:320px;margin:0 auto;}
+.ttt-cell{aspect-ratio:1;background:#f4f4fc;border-radius:14px;border:3px solid #e0e0f0;font-size:2.8rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;user-select:none;}
+.ttt-cell:hover:not(.taken){background:#e8f2ff;border-color:var(--sky);transform:scale(1.04);}
+.ttt-cell.taken{cursor:default;}
+.ttt-cell.x-cell{color:var(--coral);}
+.ttt-cell.o-cell{color:var(--sky);}
+.ttt-cell.win-cell{background:linear-gradient(135deg,#fffbe8,#fff3c0);border-color:var(--sun);}
+/* CHECKERS */
+.checkers-wrap{display:flex;justify-content:center;}
+.ck-board{display:grid;grid-template-columns:repeat(8,1fr);border:4px solid #b0a090;border-radius:10px;overflow:hidden;max-width:440px;width:100%;box-shadow:var(--shadow);}
+.ck-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.ck-cell.light{background:#f0e8d8;}
+.ck-cell.dark{background:#7a6040;}
+.ck-cell.sel{background:#FFD700 !important;}
+.ck-cell.movable{background:#7ed87e !important;}
+.ck-piece{width:76%;height:76%;border-radius:50%;pointer-events:none;user-select:none;border:3px solid rgba(0,0,0,0.2);box-shadow:0 3px 8px rgba(0,0,0,0.3),inset 0 2px 4px rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:900;color:rgba(255,255,255,0.9);}
+.ck-piece.r{background:radial-gradient(circle at 35% 30%,#ff8888,#cc1111);}
+.ck-piece.b{background:radial-gradient(circle at 35% 30%,#8899ff,#2233cc);}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;justify-content:center;}
+.action-btn{padding:10px 22px;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.9rem;cursor:pointer;transition:all .2s;}
+.btn-new{background:linear-gradient(135deg,var(--sky),#7b2fff);color:#fff;}
+.btn-new:hover{transform:scale(1.04);}
+.btn-reset{background:#f4f4fc;color:var(--muted);border:2px solid #e0e0f0;}
+.btn-reset:hover{background:#e8e8f8;}
+.win-overlay{display:none;position:fixed;inset:0;z-index:100;background:rgba(30,20,60,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;}
+.win-overlay.show{display:flex;}
+.win-card{background:#fff;border-radius:28px;padding:40px 48px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:pop-in .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pop-in{from{transform:scale(0.5);opacity:0}to{transform:scale(1);opacity:1}}
+.win-emoji{font-size:4rem;margin-bottom:10px;}
+.win-text{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--text);margin-bottom:6px;}
+.win-sub{color:var(--muted);font-size:1rem;font-weight:700;margin-bottom:20px;}
+.btn-play-again{background:linear-gradient(135deg,var(--coral),var(--purple));color:#fff;border:none;border-radius:14px;padding:14px 32px;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;}
+.btn-play-again:hover{transform:scale(1.05);}
+.confetti-piece{position:fixed;border-radius:2px;opacity:0;z-index:200;pointer-events:none;animation:conf-fall 2s ease-out forwards;}
+@keyframes conf-fall{0%{opacity:1;transform:translateY(-20px) rotate(0deg);}100%{opacity:0;transform:translateY(100vh) rotate(720deg);}}
+footer{text-align:center;font-size:0.72rem;color:var(--muted);font-weight:700;padding-top:4px;}
 </style>
 </head>
 <body>
@@ -246,16 +97,11 @@ footer { text-align:center; font-size:0.72rem; color:var(--muted); font-weight:7
   <div class="shape s1"></div><div class="shape s2"></div>
   <div class="shape s3"></div><div class="shape s4"></div><div class="shape s5"></div>
 </div>
-
 <div id="app">
-
-  <!-- Header -->
   <header>
     <div class="game-title">🎮 Game <span>Time!</span></div>
     <div class="game-sub">Playful Strategies for Real Life Challenges</div>
   </header>
-
-  <!-- Share link -->
   <div class="card">
     <div class="share-label">🔗 Share this link with your player:</div>
     <div class="share-row">
@@ -267,183 +113,167 @@ footer { text-align:center; font-size:0.72rem; color:var(--muted); font-weight:7
       <span id="connText">Connecting...</span>
     </div>
   </div>
-
-  <!-- Players -->
   <div class="players-row">
     <div class="player-card p1-card" id="p1Card">
       <div class="you-badge" id="p1You" style="display:none">YOU</div>
       <div class="player-label">Player 1</div>
       <input class="player-name-input" id="p1Name" value="Name" maxlength="14" oninput="onNameChange(1)">
-      <div class="player-piece" id="p1Piece">🔴</div>
+      <div class="player-piece" id="p1Piece">❌</div>
       <div class="score-display">Wins: <span class="score-num" id="p1Score">0</span></div>
     </div>
     <div class="player-card p2-card" id="p2Card">
       <div class="you-badge" id="p2You" style="display:none">YOU</div>
       <div class="player-label">Player 2</div>
       <input class="player-name-input" id="p2Name" value="Name" maxlength="14" oninput="onNameChange(2)">
-      <div class="player-piece" id="p2Piece">🔵</div>
+      <div class="player-piece" id="p2Piece">⭕</div>
       <div class="score-display">Wins: <span class="score-num" id="p2Score">0</span></div>
     </div>
   </div>
-
-  <!-- Game selector -->
   <div class="game-selector">
     <div class="game-tab active" id="tab-ttt" onclick="selectGame('ttt')">
-      <span class="tab-emoji">❌⭕</span>
-      Tic Tac Toe
+      <span class="tab-emoji">❌⭕</span>Tic Tac Toe
     </div>
-    <div class="game-tab" id="tab-checkers" onclick="selectGame('checkers')">
-      <span class="tab-emoji">🔴🔵</span>
-      Checkers
+    <div class="game-tab" id="tab-ck" onclick="selectGame('ck')">
+      <span class="tab-emoji">🔴🔵</span>Checkers
     </div>
   </div>
-
-  <!-- Turn banner -->
   <div class="turn-banner" id="turnBanner">⏳ Waiting for Player 2 to join...</div>
-
-  <!-- Tic Tac Toe -->
-  <div id="ttt-panel">
+  <div id="ttt-panel" style="width:100%">
     <div class="ttt-board" id="tttBoard"></div>
     <div class="btn-row">
-      <button class="action-btn btn-new" onclick="newTTT()">🔄 New Game</button>
+      <button class="action-btn btn-new" onclick="newTTT(true)">🔄 New Game</button>
       <button class="action-btn btn-reset" onclick="resetScores()">Reset Scores</button>
     </div>
   </div>
-
-  <!-- Checkers -->
-  <div id="checkers-panel" style="display:none">
-    <div class="checkers-board-wrap">
-      <div class="checkers-board" id="checkersBoard"></div>
+  <div id="ck-panel" style="display:none;width:100%">
+    <div class="checkers-wrap">
+      <div class="ck-board" id="ckBoard"></div>
     </div>
     <div class="btn-row">
-      <button class="action-btn btn-new" onclick="newCheckers()">🔄 New Game</button>
+      <button class="action-btn btn-new" onclick="newCK(true)">🔄 New Game</button>
       <button class="action-btn btn-reset" onclick="resetScores()">Reset Scores</button>
     </div>
   </div>
-
   <footer>© Michelle S. Coleman LPC PLLC — All Rights Reserved</footer>
 </div>
-
-<!-- Win overlay -->
 <div class="win-overlay" id="winOverlay">
   <div class="win-card">
     <div class="win-emoji" id="winEmoji">🎉</div>
-    <div class="win-text" id="winText">Player 1 Wins!</div>
-    <div class="win-sub" id="winSub">Amazing game!</div>
+    <div class="win-text" id="winText">You Win!</div>
+    <div class="win-sub" id="winSub">Amazing!</div>
     <button class="btn-play-again" onclick="playAgain()">🎮 Play Again!</button>
   </div>
 </div>
 
 <script>
-// ─── STATE ───────────────────────────────────────────────────────
-let peer=null,conn=null,isHost=false,myPlayer=1;
+// ══════════════════════════════════════
+//  GLOBALS
+// ══════════════════════════════════════
+let peer=null, conn=null, isHost=false, myPlayer=1;
 let currentGame='ttt';
-let gameActive=false;
 let scores={1:0,2:0};
 
-// TTT state
-let tttBoard=Array(9).fill(null);
-let tttTurn=1; // 1 or 2
-
-// Checkers state
-let ckBoard=[];
-let ckTurn=1;
-let ckSelected=null;
-let ckValidMoves=[];
-
-// ─── NETWORK ─────────────────────────────────────────────────────
+// ══════════════════════════════════════
+//  NETWORK
+// ══════════════════════════════════════
 function genCode(){
-  const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let s=''; for(let i=0;i<6;i++) s+=c[Math.floor(Math.random()*c.length)]; return s;
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s='';
+  for(let i=0;i<6;i++) s+=chars[Math.floor(Math.random()*chars.length)];
+  return s;
 }
 function setConn(color,msg){
   document.getElementById('connDot').className='dot '+color;
   document.getElementById('connText').textContent=msg;
 }
-function send(msg){ if(conn&&conn.open){ try{conn.send(msg);}catch(e){} } }
+function send(msg){
+  if(conn&&conn.open){ try{ conn.send(msg); }catch(e){} }
+}
+function getName(p){ return document.getElementById('p'+p+'Name').value||'Player '+p; }
+function setName(p,v){
+  const prev=document.getElementById('p'+p+'Name').oninput;
+  document.getElementById('p'+p+'Name').oninput=null;
+  document.getElementById('p'+p+'Name').value=v;
+  document.getElementById('p'+p+'Name').oninput=prev;
+}
 
 function initNetwork(){
-  const params=new URLSearchParams(window.location.search);
-  const code=params.get('game');
+  const code=new URLSearchParams(window.location.search).get('game');
   if(!code){
     isHost=true; myPlayer=1;
     const rc=genCode();
-    const url=window.location.href.split('?')[0]+'?game='+rc;
-    document.getElementById('shareUrl').textContent=url;
+    document.getElementById('shareUrl').textContent=location.href.split('?')[0]+'?game='+rc;
     document.getElementById('p1You').style.display='';
-    setConn('orange','Ready! Share the link with your player.');
     peer=new Peer('gt-'+rc,{debug:0});
-    peer.on('open',()=>setConn('orange','Ready! Share the link with your player.'));
+    peer.on('open',()=>setConn('orange','Ready! Share the link above with your player.'));
     peer.on('connection',c=>{
-      conn=c; setupConn();
+      conn=c; wireConn();
       setConn('green','✅ Player 2 connected!');
-      send({type:'name',player:1,name:p1Name()});
-      send({type:'scores',s:scores});
-      send({type:'gameSwitch',game:currentGame});
     });
-    peer.on('error',e=>setConn('red','Network error: '+e.type));
+    peer.on('error',e=>setConn('red','Error: '+e.type));
   } else {
     isHost=false; myPlayer=2;
-    const url=window.location.href.split('?')[0]+'?game='+code;
-    document.getElementById('shareUrl').textContent=url;
+    document.getElementById('shareUrl').textContent=location.href.split('?')[0]+'?game='+code;
     document.getElementById('p2You').style.display='';
-    document.getElementById('p2Name').value='Name';
     setConn('orange','Connecting...');
     peer=new Peer({debug:0});
     peer.on('open',()=>{
       conn=peer.connect('gt-'+code,{reliable:true});
-      setupConn();
+      wireConn();
     });
     peer.on('error',()=>setConn('red','Could not connect. Check the link.'));
   }
 }
 
-function setupConn(){
+function wireConn(){
   conn.on('open',()=>{
-    if(!isHost){
-      setConn('green','✅ Connected!');
-      send({type:'name',player:2,name:p2Name()});
+    setConn('green', isHost?'✅ Player 2 connected!':'✅ Connected!');
+    if(isHost){
+      // Send host state to new guest
+      send({type:'welcome', n1:getName(1), n2:getName(2), scores, game:currentGame});
+    } else {
+      // Guest sends their name
+      send({type:'name', player:2, name:getName(2)});
     }
-    gameActive=true;
-    updateTurnBanner();
+    updateBanner();
   });
-  conn.on('data',handleMsg);
-  conn.on('close',()=>{ setConn('red','Disconnected.'); gameActive=false; });
+  conn.on('data', onMsg);
+  conn.on('close',()=>setConn('red','Disconnected.'));
   conn.on('error',()=>setConn('red','Connection error.'));
 }
 
-function handleMsg(msg){
+function onMsg(msg){
   switch(msg.type){
+    case 'welcome':
+      setName(1,msg.n1); setName(2,msg.n2);
+      scores=msg.scores; updateScoreDisplay();
+      switchGameLocal(msg.game);
+      break;
     case 'name':
-      document.getElementById(`p${msg.player}Name`).value=msg.name; break;
-    case 'scores':
-      scores=msg.s; updateScoreDisplay(); break;
-    case 'gameSwitch':
-      switchGameLocal(msg.game); break;
-    case 'tttMove':
-      applyTTTMove(msg.idx, false); break;
-    case 'tttNew':
-      resetTTTLocal(); break;
-    case 'ckNew':
-      resetCheckersLocal(); break;
-    case 'ckMove':
-      applyCheckerMove(msg.move, false); break;
-    case 'resetScores':
-      scores={1:0,2:0}; updateScoreDisplay(); break;
+      // The OTHER player sent their name — set it on my screen
+      setName(msg.player, msg.name);
+      updateBanner();
+      break;
+    case 'scores': scores=msg.s; updateScoreDisplay(); break;
+    case 'gameSwitch': switchGameLocal(msg.game); break;
+    case 'tttMove': applyTTT(msg.i, false); break;
+    case 'tttNew': newTTT(false); break;
+    case 'ckMove': applyCK(msg.move, false); break;
+    case 'ckNew': newCK(false); break;
+    case 'resetScores': scores={1:0,2:0}; updateScoreDisplay(); break;
   }
 }
 
-// ─── NAMES ───────────────────────────────────────────────────────
-function p1Name(){ return document.getElementById('p1Name').value||'Player 1'; }
-function p2Name(){ return document.getElementById('p2Name').value||'Player 2'; }
 function onNameChange(player){
-  send({type:'name',player,name:player===1?p1Name():p2Name()});
+  if(player===myPlayer){
+    send({type:'name', player, name:getName(player)});
+    updateBanner();
+  }
 }
-function myName(){ return myPlayer===1?p1Name():p2Name(); }
-function currentName(){ return ckTurn===1?p1Name():p2Name(); }
-function currentTTTName(){ return tttTurn===1?p1Name():p2Name(); }
 
-// ─── SCORES ──────────────────────────────────────────────────────
+// ══════════════════════════════════════
+//  SCORES & GAME SELECT
+// ══════════════════════════════════════
 function updateScoreDisplay(){
   document.getElementById('p1Score').textContent=scores[1];
   document.getElementById('p2Score').textContent=scores[2];
@@ -452,278 +282,253 @@ function resetScores(){
   scores={1:0,2:0}; updateScoreDisplay();
   send({type:'resetScores'});
 }
-function addWin(player){
-  scores[player]=(scores[player]||0)+1;
+function addWin(p){
+  scores[p]=(scores[p]||0)+1;
   updateScoreDisplay();
   send({type:'scores',s:scores});
 }
 
-// ─── ACTIVE CARD ─────────────────────────────────────────────────
-function updateTurnBanner(){
-  const turn = currentGame==='ttt'?tttTurn:ckTurn;
-  const name = currentGame==='ttt'?currentTTTName():currentName();
-  const banner=document.getElementById('turnBanner');
-  if(!gameActive){ banner.textContent='⏳ Waiting for Player 2 to join...'; return; }
-  if(turn===myPlayer) banner.textContent=`✨ Your turn, ${myName()}!`;
-  else banner.textContent=`⏳ ${name}'s turn...`;
-  document.getElementById('p1Card').classList.toggle('active-turn',turn===1);
-  document.getElementById('p2Card').classList.toggle('active-turn',turn===2);
-}
-
-// ─── GAME SELECTOR ───────────────────────────────────────────────
 function selectGame(game){
   switchGameLocal(game);
   send({type:'gameSwitch',game});
 }
 function switchGameLocal(game){
   currentGame=game;
-  document.getElementById('ttt-panel').style.display=game==='ttt'?'':'none';
-  document.getElementById('checkers-panel').style.display=game==='checkers'?'':'none';
+  document.getElementById('ttt-panel').style.display=game==='ttt'?'block':'none';
+  document.getElementById('ck-panel').style.display=game==='ck'?'block':'none';
   document.getElementById('tab-ttt').classList.toggle('active',game==='ttt');
-  document.getElementById('tab-checkers').classList.toggle('active',game==='checkers');
-  // Update pieces display
-  if(game==='ttt'){
-    document.getElementById('p1Piece').textContent='❌';
-    document.getElementById('p2Piece').textContent='⭕';
-  } else {
-    document.getElementById('p1Piece').textContent='🔴';
-    document.getElementById('p2Piece').textContent='🔵';
-  }
-  updateTurnBanner();
+  document.getElementById('tab-ck').classList.toggle('active',game==='ck');
+  document.getElementById('p1Piece').textContent=game==='ttt'?'❌':'🔴';
+  document.getElementById('p2Piece').textContent=game==='ttt'?'⭕':'🔵';
+  updateBanner();
 }
 
-// ═══════════════════════════════════════════════════════════════
+function updateBanner(){
+  const turn=currentGame==='ttt'?tttTurn:ckTurn;
+  const banner=document.getElementById('turnBanner');
+  banner.textContent=turn===myPlayer?`✨ Your turn, ${getName(myPlayer)}!`:`⏳ ${getName(turn)}'s turn...`;
+  document.getElementById('p1Card').classList.toggle('active-turn',turn===1);
+  document.getElementById('p2Card').classList.toggle('active-turn',turn===2);
+}
+
+// ══════════════════════════════════════
 //  TIC TAC TOE
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════
+let tttBoard=Array(9).fill(null);
+let tttTurn=1;
+
 function buildTTT(){
-  const board=document.getElementById('tttBoard');
-  board.innerHTML='';
+  const el=document.getElementById('tttBoard');
+  el.innerHTML='';
   for(let i=0;i<9;i++){
-    const cell=document.createElement('div');
-    cell.className='ttt-cell'; cell.id='ttt-'+i;
-    cell.onclick=()=>tttClick(i);
-    board.appendChild(cell);
+    const c=document.createElement('div');
+    c.className='ttt-cell';
+    c.onclick=(()=>{ const idx=i; return ()=>tttClick(idx); })();
+    el.appendChild(c);
   }
 }
 
-function tttClick(idx){
-  if(tttTurn!==myPlayer) return;
-  if(tttBoard[idx]) return;
-  applyTTTMove(idx, true);
+function tttClick(i){
+  if(tttTurn!==myPlayer||tttBoard[i]) return;
+  applyTTT(i,true);
 }
 
-function applyTTTMove(idx, broadcast){
-  if(tttBoard[idx]) return;
-  tttBoard[idx]=tttTurn;
-  const cell=document.getElementById('ttt-'+idx);
-  cell.classList.add('taken', tttTurn===1?'x-cell':'o-cell');
-  cell.textContent=tttTurn===1?'❌':'⭕';
-  if(broadcast) send({type:'tttMove',idx});
+function applyTTT(i, broadcast){
+  if(tttBoard[i]) return;
+  tttBoard[i]=tttTurn;
+  const cells=document.getElementById('tttBoard').children;
+  cells[i].classList.add('taken', tttTurn===1?'x-cell':'o-cell');
+  cells[i].textContent=tttTurn===1?'❌':'⭕';
+  if(broadcast) send({type:'tttMove',i});
 
-  const winner=checkTTT();
-  if(winner){
-    highlightTTTWin(winner.cells);
-    const name=winner.player===1?p1Name():p2Name();
-    setTimeout(()=>showWin(winner.player, name, '🎉'), 400);
-    addWin(winner.player);
+  const win=checkTTT();
+  if(win){
+    win.cells.forEach(j=>cells[j].classList.add('win-cell'));
+    const p=win.player, name=getName(p);
+    setTimeout(()=>{ showWin(p,name,'🎉'); addWin(p); },350);
     return;
   }
-  if(tttBoard.every(c=>c)){
-    setTimeout(()=>showDraw(),400); return;
-  }
+  if(tttBoard.every(v=>v)){ setTimeout(showDraw,350); return; }
   tttTurn=tttTurn===1?2:1;
-  updateTurnBanner();
+  updateBanner();
 }
 
 function checkTTT(){
-  const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  for(const [a,b,c] of wins){
+  const L=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  for(const [a,b,c] of L){
     if(tttBoard[a]&&tttBoard[a]===tttBoard[b]&&tttBoard[a]===tttBoard[c])
       return {player:tttBoard[a],cells:[a,b,c]};
   }
   return null;
 }
 
-function highlightTTTWin(cells){
-  cells.forEach(i=>document.getElementById('ttt-'+i).classList.add('win-cell'));
+function newTTT(broadcast){
+  tttBoard=Array(9).fill(null); tttTurn=1;
+  buildTTT(); updateBanner();
+  if(broadcast) send({type:'tttNew'});
 }
 
-function newTTT(){
-  resetTTTLocal();
-  send({type:'tttNew'});
-}
-function resetTTTLocal(){
-  tttBoard=Array(9).fill(null);
-  tttTurn=1;
-  buildTTT();
-  updateTurnBanner();
-}
-
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════
 //  CHECKERS
-// ═══════════════════════════════════════════════════════════════
-function initCheckerBoard(){
-  ckBoard=[];
+// ══════════════════════════════════════
+let ckGrid=[];   // [row][col] = null | {p:1|2, king:bool}
+let ckTurn=1;
+let ckSel=null;  // {r,c}
+let ckMoves=[];  // [{fr,fc,tr,tc,cap}]
+
+function initCKGrid(){
+  ckGrid=[];
   for(let r=0;r<8;r++){
-    ckBoard[r]=[];
+    ckGrid[r]=[];
     for(let c=0;c<8;c++){
-      const isDark=(r+c)%2===1;
-      let piece=null;
-      if(isDark && r<3) piece={player:2,king:false};
-      if(isDark && r>4) piece={player:1,king:false};
-      ckBoard[r][c]=piece;
+      const dark=(r+c)%2===1;
+      ckGrid[r][c]=dark&&r<=2?{p:2,king:false}:dark&&r>=5?{p:1,king:false}:null;
     }
   }
+  ckTurn=1; ckSel=null; ckMoves=[];
 }
 
-function buildCheckersBoard(){
-  const board=document.getElementById('checkersBoard');
-  board.innerHTML='';
+function drawCK(){
+  const el=document.getElementById('ckBoard');
+  el.innerHTML='';
   for(let r=0;r<8;r++){
     for(let c=0;c<8;c++){
       const cell=document.createElement('div');
-      const isDark=(r+c)%2===1;
-      cell.className='checkers-cell '+(isDark?'dark':'light');
-      cell.id=`ck-${r}-${c}`;
-      cell.dataset.r=r; cell.dataset.c=c;
-      cell.onclick=()=>ckClick(r,c);
-      const piece=ckBoard[r][c];
+      const dark=(r+c)%2===1;
+      cell.className='ck-cell '+(dark?'dark':'light');
+      if(ckSel&&ckSel.r===r&&ckSel.c===c) cell.classList.add('sel');
+      if(ckMoves.some(m=>m.tr===r&&m.tc===c)) cell.classList.add('movable');
+      const piece=ckGrid[r][c];
       if(piece){
-        const ch=document.createElement('div');
-        ch.className='checker p'+piece.player+(piece.king?' king':'');
-        ch.textContent=piece.king?'♛':'';
-        cell.appendChild(ch);
+        const div=document.createElement('div');
+        div.className='ck-piece '+(piece.p===1?'r':'b');
+        div.textContent=piece.king?'♛':'';
+        cell.appendChild(div);
       }
-      board.appendChild(cell);
+      // Bind click with correct row/col
+      cell.addEventListener('click', (function(row,col){ return function(){ ckClick(row,col); }; })(r,c));
+      el.appendChild(cell);
     }
   }
-  highlightCKMoves();
 }
 
 function ckClick(r,c){
   if(ckTurn!==myPlayer) return;
+  const piece=ckGrid[r][c];
 
-  const piece=ckBoard[r][c];
+  // Clicking a highlighted destination
+  const move=ckMoves.find(m=>m.tr===r&&m.tc===c);
+  if(move){ applyCK(move,true); return; }
 
-  // If clicking a valid move destination
-  const moveTarget=ckValidMoves.find(m=>m.toR===r&&m.toC===c);
-  if(moveTarget && ckSelected!==null){
-    applyCheckerMove(moveTarget, true);
+  // Clicking own piece
+  if(piece&&piece.p===myPlayer){
+    ckSel={r,c};
+    ckMoves=calcMoves(r,c);
+    drawCK();
     return;
   }
 
-  // Select own piece
-  if(piece&&piece.player===myPlayer){
-    ckSelected={r,c};
-    ckValidMoves=getValidMoves(r,c);
-    buildCheckersBoard();
-    document.getElementById(`ck-${r}-${c}`).classList.add('selected');
-    ckValidMoves.forEach(m=>document.getElementById(`ck-${m.toR}-${m.toC}`).classList.add('can-move'));
-  } else {
-    ckSelected=null; ckValidMoves=[];
-    buildCheckersBoard();
-  }
+  // Deselect
+  ckSel=null; ckMoves=[];
+  drawCK();
 }
 
-function getValidMoves(r,c){
-  const piece=ckBoard[r][c];
+function calcMoves(r,c){
+  const piece=ckGrid[r][c];
   if(!piece) return [];
-  const moves=[];
   const dirs=[];
-  if(piece.player===1||piece.king) dirs.push([-1,-1],[-1,1]); // up
-  if(piece.player===2||piece.king) dirs.push([1,-1],[1,1]);   // down
+  if(piece.p===1||piece.king) dirs.push([-1,-1],[-1,1]); // P1 moves up
+  if(piece.p===2||piece.king) dirs.push([1,-1],[1,1]);    // P2 moves down
 
+  const simple=[], jumps=[];
   for(const [dr,dc] of dirs){
     const nr=r+dr, nc=c+dc;
     if(nr<0||nr>7||nc<0||nc>7) continue;
-    if(!ckBoard[nr][nc]){
-      moves.push({fromR:r,fromC:c,toR:nr,toC:nc,jump:false});
-    } else if(ckBoard[nr][nc].player!==piece.player){
+    if(!ckGrid[nr][nc]){
+      simple.push({fr:r,fc:c,tr:nr,tc:nc,cap:null});
+    } else if(ckGrid[nr][nc].p!==piece.p){
       const jr=nr+dr, jc=nc+dc;
-      if(jr>=0&&jr<=7&&jc>=0&&jc<=7&&!ckBoard[jr][jc]){
-        moves.push({fromR:r,fromC:c,toR:jr,toC:jc,jump:true,capR:nr,capC:nc});
+      if(jr>=0&&jr<=7&&jc>=0&&jc<=7&&!ckGrid[jr][jc])
+        jumps.push({fr:r,fc:c,tr:jr,tc:jc,cap:{r:nr,c:nc}});
+    }
+  }
+  // Forced jumps: if ANY jump exists for this player, only return jumps
+  const forced=allJumps(piece.p);
+  return forced.length>0 ? jumps : simple;
+}
+
+function allJumps(player){
+  const out=[];
+  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+    const pc=ckGrid[r][c];
+    if(!pc||pc.p!==player) continue;
+    const dirs=[];
+    if(pc.p===1||pc.king) dirs.push([-1,-1],[-1,1]);
+    if(pc.p===2||pc.king) dirs.push([1,-1],[1,1]);
+    for(const [dr,dc] of dirs){
+      const nr=r+dr,nc=c+dc;
+      if(nr<0||nr>7||nc<0||nc>7) continue;
+      if(ckGrid[nr][nc]&&ckGrid[nr][nc].p!==player){
+        const jr=nr+dr,jc=nc+dc;
+        if(jr>=0&&jr<=7&&jc>=0&&jc<=7&&!ckGrid[jr][jc])
+          out.push({fr:r,fc:c,tr:jr,tc:jc,cap:{r:nr,c:nc}});
       }
     }
   }
-  // Force jumps if available
-  const allJumps=getAllJumps(piece.player);
-  if(allJumps.length>0) return moves.filter(m=>m.jump);
-  return moves;
+  return out;
 }
 
-function getAllJumps(player){
-  const jumps=[];
-  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
-    if(ckBoard[r][c]&&ckBoard[r][c].player===player){
-      const ms=getValidMoves(r,c);
-      ms.filter(m=>m.jump).forEach(m=>jumps.push(m));
-    }
-  }
-  return jumps;
-}
-
-function applyCheckerMove(move, broadcast){
-  const piece=ckBoard[move.fromR][move.fromC];
-  ckBoard[move.toR][move.toC]=piece;
-  ckBoard[move.fromR][move.fromC]=null;
-  if(move.jump) ckBoard[move.capR][move.capC]=null;
-
-  // King promotion
-  if(piece.player===1&&move.toR===0) piece.king=true;
-  if(piece.player===2&&move.toR===7) piece.king=true;
-
-  ckSelected=null; ckValidMoves=[];
+function applyCK(move, broadcast){
+  const piece=ckGrid[move.fr][move.fc];
+  ckGrid[move.tr][move.tc]=piece;
+  ckGrid[move.fr][move.fc]=null;
+  if(move.cap) ckGrid[move.cap.r][move.cap.c]=null;
+  if(piece.p===1&&move.tr===0) piece.king=true;
+  if(piece.p===2&&move.tr===7) piece.king=true;
   if(broadcast) send({type:'ckMove',move});
+  ckSel=null; ckMoves=[];
 
-  // Check win
-  const p1pieces=ckBoard.flat().filter(p=>p&&p.player===1).length;
-  const p2pieces=ckBoard.flat().filter(p=>p&&p.player===2).length;
-  if(p1pieces===0){ buildCheckersBoard(); setTimeout(()=>{showWin(2,p2Name(),'🔵');addWin(2);},300); return; }
-  if(p2pieces===0){ buildCheckersBoard(); setTimeout(()=>{showWin(1,p1Name(),'🔴');addWin(1);},300); return; }
+  const p1=ckGrid.flat().filter(p=>p&&p.p===1).length;
+  const p2=ckGrid.flat().filter(p=>p&&p.p===2).length;
+  drawCK();
+  if(p1===0){ setTimeout(()=>{showWin(2,getName(2),'🔵');addWin(2);},300); return; }
+  if(p2===0){ setTimeout(()=>{showWin(1,getName(1),'🔴');addWin(1);},300); return; }
 
-  // Check if opponent has any moves
-  const nextPlayer=ckTurn===1?2:1;
-  const hasMoves=hasAnyMoves(nextPlayer);
-  if(!hasMoves){ buildCheckersBoard(); const winner=ckTurn; setTimeout(()=>{showWin(winner,winner===1?p1Name():p2Name(),'🏆');addWin(winner);},300); return; }
-
-  ckTurn=nextPlayer;
-  buildCheckersBoard();
-  updateTurnBanner();
+  const next=ckTurn===1?2:1;
+  const hasMoves=allJumps(next).length>0 || hasSimple(next);
+  if(!hasMoves){ setTimeout(()=>{showWin(ckTurn,getName(ckTurn),'🏆');addWin(ckTurn);},300); return; }
+  ckTurn=next;
+  updateBanner();
 }
 
-function hasAnyMoves(player){
-  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
-    if(ckBoard[r][c]&&ckBoard[r][c].player===player){
-      if(getValidMoves(r,c).length>0) return true;
+function hasSimple(player){
+  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+    const pc=ckGrid[r][c];
+    if(!pc||pc.p!==player) continue;
+    const dirs=[];
+    if(pc.p===1||pc.king) dirs.push([-1,-1],[-1,1]);
+    if(pc.p===2||pc.king) dirs.push([1,-1],[1,1]);
+    for(const [dr,dc] of dirs){
+      const nr=r+dr,nc=c+dc;
+      if(nr>=0&&nr<=7&&nc>=0&&nc<=7&&!ckGrid[nr][nc]) return true;
     }
   }
   return false;
 }
 
-function highlightCKMoves(){
-  if(ckSelected){
-    document.getElementById(`ck-${ckSelected.r}-${ckSelected.c}`).classList.add('selected');
-    ckValidMoves.forEach(m=>document.getElementById(`ck-${m.toR}-${m.toC}`).classList.add('can-move'));
-  }
+function newCK(broadcast){
+  initCKGrid(); drawCK(); updateBanner();
+  if(broadcast) send({type:'ckNew'});
 }
 
-function newCheckers(){
-  resetCheckersLocal();
-  send({type:'ckNew'});
-}
-function resetCheckersLocal(){
-  ckTurn=1; ckSelected=null; ckValidMoves=[];
-  initCheckerBoard(); buildCheckersBoard(); updateTurnBanner();
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  WIN / DRAW
-// ═══════════════════════════════════════════════════════════════
-function showWin(player, name, emoji){
+// ══════════════════════════════════════
+//  WIN / DRAW / CONFETTI
+// ══════════════════════════════════════
+function showWin(player,name,emoji){
   spawnConfetti();
   document.getElementById('winEmoji').textContent=emoji;
-  document.getElementById('winText').textContent=`${name} Wins! 🎉`;
-  document.getElementById('winSub').textContent=player===myPlayer?'That\'s you! Amazing! 🌟':'Great game!';
+  document.getElementById('winText').textContent=name+' Wins! 🎉';
+  document.getElementById('winSub').textContent=player===myPlayer?'That\'s YOU! Amazing! 🌟':'Great game!';
   document.getElementById('winOverlay').classList.add('show');
 }
 function showDraw(){
@@ -734,34 +539,30 @@ function showDraw(){
 }
 function playAgain(){
   document.getElementById('winOverlay').classList.remove('show');
-  if(currentGame==='ttt') newTTT();
-  else newCheckers();
+  currentGame==='ttt'?newTTT(true):newCK(true);
 }
-
 function spawnConfetti(){
   const colors=['#FFD93D','#FF6B6B','#4D96FF','#6BCB77','#C77DFF'];
   for(let i=0;i<60;i++){
     const el=document.createElement('div');
     el.className='confetti-piece';
-    el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-delay:${Math.random()*1}s;animation-duration:${1.5+Math.random()*1}s;transform:rotate(${Math.random()*360}deg);width:${6+Math.random()*10}px;height:${6+Math.random()*10}px;`;
+    el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[i%colors.length]};animation-delay:${Math.random()}s;animation-duration:${1.5+Math.random()}s;width:${7+Math.random()*9}px;height:${7+Math.random()*9}px;`;
     document.body.appendChild(el);
     setTimeout(()=>el.remove(),3000);
   }
 }
-
 function copyLink(){
-  const url=document.getElementById('shareUrl').textContent;
-  navigator.clipboard.writeText(url).then(()=>{
+  navigator.clipboard.writeText(document.getElementById('shareUrl').textContent).then(()=>{
     const btn=document.getElementById('copyBtn');
     btn.textContent='✅ Copied!'; btn.classList.add('copied');
-    setTimeout(()=>{btn.textContent='📋 Copy';btn.classList.remove('copied');},2000);
+    setTimeout(()=>{ btn.textContent='📋 Copy'; btn.classList.remove('copied'); },2000);
   });
 }
 
-// ─── INIT ────────────────────────────────────────────────────────
+// ── INIT ──
 buildTTT();
-initCheckerBoard();
-buildCheckersBoard();
+initCKGrid();
+drawCK();
 initNetwork();
 </script>
 </body>
