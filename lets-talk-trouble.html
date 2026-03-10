@@ -566,6 +566,9 @@ function initNetwork(){
     document.getElementById('p1YouBadge').style.display='none';
     document.getElementById('p2YouBadge').style.display='';
     document.getElementById('startBtn').style.display='none';
+    document.getElementById('p2Name').value='Player 2';
+    document.getElementById('p2Name').placeholder='Type your name...';
+    document.getElementById('p2Name').focus();
     setConn('orange','Connecting to host...');
 
     peer=new Peer({debug:0});
