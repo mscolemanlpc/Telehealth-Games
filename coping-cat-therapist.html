@@ -343,12 +343,12 @@ body::before{content:'';position:fixed;inset:0;background-image:
 <div id="role-screen" class="screen active">
   <div class="role-screen">
     <div class="role-card">
-      <span class="role-cat">🌿</span>
+      <span class="role-cat">🪄</span>
       <div class="role-title" style="background:linear-gradient(135deg,var(--mint),var(--lavender));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Therapist Portal</div>
       <p class="role-sub">Michelle S. Coleman, LPC<br>Enter your client's session code to connect to their live game.</p>
       <div class="role-btns" style="grid-template-columns:1fr;">
         <div class="role-btn therapist" onclick="chooseRole('therapist')">
-          <span class="rb-icon">🌿</span>
+          <span class="rb-icon">🪄</span>
           <div class="rb-title">Open Dashboard</div>
           <div class="rb-desc">Connect to client session &amp; view live screen</div>
         </div>
@@ -370,7 +370,7 @@ body::before{content:'';position:fixed;inset:0;background-image:
   <!-- Join -->
   <div class="th-join" id="th-join">
     <div class="th-join-card">
-      <span class="th-icon">🌿</span>
+      <span class="th-icon">🪄</span>
       <div class="th-title">Join a Session</div>
       <p class="th-sub">Ask your client for their <strong>4-digit session code</strong> and type it below to connect to their game in real time.</p>
       <input class="code-inp" id="th-code-inp" type="text" maxlength="4" placeholder="0000" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
@@ -520,7 +520,7 @@ function chooseRole(role) {
   ROLE = 'therapist';
   hide('role-screen');
   document.getElementById('th-root').classList.add('active');
-  setPill('role-pill','pill-mint','🌿 Therapist');
+  setPill('role-pill','pill-mint','🪄 Therapist');
   showEl('role-pill');
 }
 
