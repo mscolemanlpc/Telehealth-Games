@@ -469,7 +469,12 @@ body::before{content:'';position:fixed;inset:0;background-image:
         <div class="notes-lbl">Follow-up</div>
         <textarea class="notes-ta s" placeholder="For next session..." oninput="autoSave()"></textarea>
         <div class="notes-lbl" style="margin-top:3px;">Session Checklist</div>
-        ${['Opening check-in done','Goals set','Connected to real life','Practiced coping skill','Homework assigned','Closing check-in done'].map(t=>`<div class="cl-item" onclick="this.classList.toggle('checked')"><div class="cl-chk">✓</div>${t}</div>`).join('')}
+        <div class="cl-item" onclick="this.classList.toggle('checked')"><div class="cl-chk">✓</div>Opening check-in done</div>
+        <div class="cl-item" onclick="this.classList.toggle('checked')"><div class="cl-chk">✓</div>Goals set</div>
+        <div class="cl-item" onclick="this.classList.toggle('checked')"><div class="cl-chk">✓</div>Connected to real life</div>
+        <div class="cl-item" onclick="this.classList.toggle('checked')"><div class="cl-chk">✓</div>Practiced coping skill</div>
+        <div class="cl-item" onclick="this.classList.toggle('checked')"><div class="cl-chk">✓</div>Homework assigned</div>
+        <div class="cl-item" onclick="this.classList.toggle('checked')"><div class="cl-chk">✓</div>Closing check-in done</div>
       </div>
     </div>
 
