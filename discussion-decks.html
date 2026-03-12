@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discussion Decks 🃏 — Michelle S. Coleman LPC PLLC</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
+<style>
+:root {
+  --bg: #0f0f1a;
+  --card-bg: #1a1a2e;
+  --surface: #16213e;
+  --border: rgba(255,255,255,0.08);
+  --text: #f0f0ff;
+  --muted: #8888aa;
+  --sun: #FFD93D;
+  --coral: #FF6B8A;
+  --sky: #4FC3F7;
+  --mint: #69F0AE;
+  --purple: #CE93D8;
+  --orange: #FFB74D;
+  /* Deck colors */
+  --cbt: #7C4DFF;
+  --cbt-light: #EDE7F6;
+  --coping: #00BCD4;
+  --coping-light: #E0F7FA;
+  --social: #FF7043;
+  --social-light: #FBE9E7;
+  --shadow: 0 20px 60px rgba(0,0,0,0.5);
+  --r: 22px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 115%; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* Stars background */
+.stars { position:fixed; inset:0; pointer-events:none; z-index:0; }
+.star { position:absolute; border-radius:50%; background:#fff; animation: twinkle 3s ease-in-out infinite; }
+@keyframes twinkle { 0%,100%{opacity:.1;transform:scale(1)} 50%{opacity:.7;transform:scale(1.3)} }
+
+#app {
+  position: relative; z-index: 1;
+  max-width: 860px; margin: 0 auto;
+  padding: 22px 16px 50px;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+}
+
+/* ── HEADER ── */
+header { text-align: center; width: 100%; }
+.title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.4rem; color: var(--text);
+  letter-spacing: .5px;
+}
+.title span { color: var(--sun); }
+.sub { font-size: .8rem; color: var(--muted); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 3px; }
+
+/* ── SHARE BAR ── */
+.share-card {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 16px 20px; width: 100%;
+}
+.lbl { font-size: .72rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 7px; }
+.share-row { display: flex; gap: 9px; align-items: center; }
+.share-url { flex:1; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font-size: .74rem; font-weight: 700; color: var(--sky); word-break: break-all; }
+.copy-btn { background: var(--sky); color: #0a0a1a; border: none; border-radius: 10px; padding: 8px 14px; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: .78rem; cursor: pointer; white-space: nowrap; transition: all .2s; }
+.copy-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
+.copy-btn.copied { background: var(--mint); }
+.conn-row { margin-top: 8px; display: flex; align-items: center; gap: 7px; font-size: .78rem; font-weight: 700; color: var(--muted); }
+.dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.dot.orange { background: #ffa500; box-shadow: 0 0 8px #ffa500; }
+.dot.green { background: var(--mint); box-shadow: 0 0 8px var(--mint); }
+.dot.red { background: var(--coral); }
+
+/* ── PLAYERS ── */
+.players { display: flex; gap: 12px; width: 100%; }
+.pc {
+  flex:1; background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 16px; padding: 12px 15px; position: relative;
+  transition: border-color .3s, box-shadow .3s;
+}
+.pc.p1 { border-color: rgba(79,195,247,.3); }
+.pc.p2 { border-color: rgba(255,107,138,.3); }
+.pc.my-turn { box-shadow: 0 0 0 2px var(--sun), 0 0 20px rgba(255,217,61,.3); border-color: var(--sun); }
+.plbl { font-size: .66rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.pname { font-family: 'Fredoka One', cursive; font-size: 1.15rem; border: none; outline: none; background: transparent; width: 100%; color: var(--text); margin-top: 2px; }
+.pname::placeholder { color: var(--muted); }
+.you { position: absolute; top: -9px; right: 9px; background: var(--sun); color: #5a3e00; font-size: .6rem; font-weight: 900; padding: 2px 7px; border-radius: 20px; letter-spacing: 1px; text-transform: uppercase; }
+
+/* ── AGE TOGGLE ── */
+.age-row { display: flex; gap: 10px; width: 100%; }
+.age-btn {
+  flex:1; padding: 11px; border-radius: 13px;
+  border: 2px solid var(--border); background: var(--card-bg);
+  font-family: 'Fredoka One', cursive; font-size: 1rem;
+  cursor: pointer; text-align: center; color: var(--muted);
+  transition: all .2s;
+}
+.age-btn:hover { border-color: var(--sky); color: var(--text); }
+.age-btn.on { background: linear-gradient(135deg,rgba(79,195,247,.15),rgba(206,147,216,.15)); border-color: var(--sky); color: var(--text); box-shadow: 0 0 20px rgba(79,195,247,.15); }
+.age-ico { font-size: 1.6rem; display: block; margin-bottom: 3px; }
+
+/* ── DECK SELECTOR ── */
+.decks { display: flex; gap: 10px; width: 100%; }
+.deck-btn {
+  flex:1; padding: 13px 8px; border-radius: 14px;
+  border: 2px solid var(--border); background: var(--card-bg);
+  font-family: 'Fredoka One', cursive; font-size: .95rem;
+  cursor: pointer; text-align: center; color: var(--muted);
+  transition: all .25s; position: relative; overflow: hidden;
+}
+.deck-btn::before { content:''; position:absolute; inset:0; opacity:0; transition:opacity .25s; }
+.deck-btn.cbt::before { background: linear-gradient(135deg,rgba(124,77,255,.25),rgba(124,77,255,.05)); }
+.deck-btn.coping::before { background: linear-gradient(135deg,rgba(0,188,212,.25),rgba(0,188,212,.05)); }
+.deck-btn.social::before { background: linear-gradient(135deg,rgba(255,112,67,.25),rgba(255,112,67,.05)); }
+.deck-btn:hover::before, .deck-btn.on::before { opacity: 1; }
+.deck-btn.on { color: var(--text); }
+.deck-btn.on.cbt { border-color: #7C4DFF; box-shadow: 0 0 20px rgba(124,77,255,.3); }
+.deck-btn.on.coping { border-color: #00BCD4; box-shadow: 0 0 20px rgba(0,188,212,.3); }
+.deck-btn.on.social { border-color: #FF7043; box-shadow: 0 0 20px rgba(255,112,67,.3); }
+.deck-ico { font-size: 1.7rem; display: block; margin-bottom: 4px; position: relative; z-index:1; }
+.deck-name { position: relative; z-index:1; }
+.deck-count { font-size: .65rem; font-weight: 800; color: var(--muted); font-family: 'Nunito', sans-serif; position: relative; z-index:1; }
+
+/* ── CARD STAGE ── */
+.stage {
+  width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px;
+}
+.card-area {
+  perspective: 1200px; width: 100%; max-width: 520px;
+  display: flex; justify-content: center; min-height: 280px; align-items: center;
+}
+.card-wrap {
+  width: 100%; max-width: 480px;
+  transform-style: preserve-3d;
+  transition: transform .7s cubic-bezier(.4,0,.2,1);
+  position: relative; cursor: pointer;
+}
+.card-wrap.flipped { transform: rotateY(180deg); }
+.card-face, .card-back {
+  width: 100%; border-radius: 24px;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  position: absolute; top: 0; left: 0;
+}
+.card-back {
+  background: var(--card-bg); border: 2px solid var(--border);
+  min-height: 260px; display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 14px; padding: 30px;
+}
+.card-back-ico { font-size: 3.5rem; }
+.card-back-txt { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: var(--muted); }
+.card-face {
+  transform: rotateY(180deg);
+  min-height: 260px; padding: 28px 30px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+.card-face.cbt {
+  background: linear-gradient(145deg, #1a0545, #2d1b69);
+  border: 2px solid rgba(124,77,255,.5);
+  box-shadow: 0 20px 60px rgba(124,77,255,.3);
+}
+.card-face.coping {
+  background: linear-gradient(145deg, #001e26, #00363d);
+  border: 2px solid rgba(0,188,212,.5);
+  box-shadow: 0 20px 60px rgba(0,188,212,.3);
+}
+.card-face.social {
+  background: linear-gradient(145deg, #2a0d00, #3e1a00);
+  border: 2px solid rgba(255,112,67,.5);
+  box-shadow: 0 20px 60px rgba(255,112,67,.3);
+}
+.card-corner { position: absolute; top: 16px; right: 16px; font-size: .68rem; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; padding: 3px 9px; border-radius: 20px; }
+.cbt .card-corner { background: rgba(124,77,255,.3); color: #CE93D8; }
+.coping .card-corner { background: rgba(0,188,212,.3); color: #4FC3F7; }
+.social .card-corner { background: rgba(255,112,67,.3); color: #FFAB91; }
+.card-category { font-size: .72rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; opacity: .7; }
+.card-question {
+  font-family: 'Fredoka One', cursive; font-size: 1.35rem; line-height: 1.45;
+  color: #fff; flex: 1; display: flex; align-items: center;
+}
+.card-tip {
+  margin-top: 16px; padding: 11px 14px;
+  background: rgba(255,255,255,.07); border-radius: 10px;
+  font-size: .75rem; font-weight: 700; color: rgba(255,255,255,.6);
+  border-left: 3px solid rgba(255,255,255,.2);
+  line-height: 1.45;
+}
+.card-tip strong { color: rgba(255,255,255,.85); }
+
+/* card-wrap needs a static height so absolute positioning works */
+.card-wrap { min-height: 280px; }
+.card-back, .card-face { min-height: 280px; }
+
+/* ── CONTROLS ── */
+.controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width:100%; max-width:520px; }
+.ctrl-btn {
+  padding: 11px 22px; border: none; border-radius: 12px;
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: .88rem;
+  cursor: pointer; transition: all .2s;
+}
+.btn-flip { background: linear-gradient(135deg,var(--sun),var(--orange)); color: #3a2000; }
+.btn-flip:hover { transform: scale(1.05); }
+.btn-next { background: rgba(255,255,255,.1); color: var(--text); border: 1px solid var(--border); }
+.btn-next:hover { background: rgba(255,255,255,.16); }
+.btn-shuffle { background: rgba(255,255,255,.06); color: var(--muted); border: 1px solid var(--border); }
+.btn-shuffle:hover { background: rgba(255,255,255,.1); color: var(--text); }
+
+/* ── PROGRESS ── */
+.progress-row { display: flex; align-items: center; gap: 10px; font-size: .78rem; font-weight: 800; color: var(--muted); }
+.progress-bar { flex:1; height: 6px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; max-width: 160px; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width .4s ease; background: var(--sun); }
+
+/* ── TURN BANNER ── */
+.who { 
+  width: 100%; max-width: 520px; text-align: center;
+  font-family: 'Fredoka One', cursive; font-size: 1rem;
+  padding: 9px 16px; border-radius: 11px;
+  background: rgba(255,217,61,.1); color: var(--sun);
+  border: 1px solid rgba(255,217,61,.25);
+}
+
+/* ── RESPONSE AREA ── */
+.response-area {
+  width: 100%; max-width: 520px;
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 16px; padding: 16px 18px;
+}
+.response-title { font-size: .72rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.response-input {
+  width: 100%; background: rgba(255,255,255,.05);
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 13px; color: var(--text); font-family: 'Nunito', sans-serif;
+  font-size: .88rem; font-weight: 700; resize: none; min-height: 72px;
+  transition: border-color .2s;
+}
+.response-input:focus { outline: none; border-color: rgba(255,255,255,.25); }
+.response-input::placeholder { color: var(--muted); }
+.other-response {
+  margin-top: 10px; padding: 10px 13px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border);
+  border-radius: 10px; font-size: .83rem; font-weight: 700; color: rgba(255,255,255,.65);
+  min-height: 44px;
+}
+.or-lbl { font-size: .65rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+
+/* ── FOOTER ── */
+footer { text-align: center; font-size: .68rem; color: rgba(255,255,255,.2); font-weight: 700; }
+
+/* ── ANIMATIONS ── */
+@keyframes slideIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.slide-in { animation: slideIn .4s ease forwards; }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div id="app">
+
+  <header>
+    <div class="title">🃏 Discussion <span>Decks</span></div>
+    <div class="sub">Playful Strategies for Real Life Challenges</div>
+  </header>
+
+  <!-- Share -->
+  <div class="share-card">
+    <div class="lbl">🔗 Share this link with your client:</div>
+    <div class="share-row">
+      <div class="share-url" id="shareUrl">Generating link...</div>
+      <button class="copy-btn" id="copyBtn" onclick="copyLink()">📋 Copy</button>
+    </div>
+    <div class="conn-row">
+      <span class="dot orange" id="cDot"></span>
+      <span id="cTxt">Connecting...</span>
+    </div>
+  </div>
+
+  <!-- Players -->
+  <div class="players">
+    <div class="pc p1" id="pc1">
+      <div class="you" id="y1" style="display:none">YOU</div>
+      <div class="plbl">Player 1</div>
+      <input class="pname" id="n1" value="Therapist" maxlength="14" placeholder="Your name" oninput="onName(1)">
+    </div>
+    <div class="pc p2" id="pc2">
+      <div class="you" id="y2" style="display:none">YOU</div>
+      <div class="plbl">Player 2</div>
+      <input class="pname" id="n2" value="Client" maxlength="14" placeholder="Your name" oninput="onName(2)">
+    </div>
+  </div>
+
+  <!-- Age toggle -->
+  <div class="age-row">
+    <div class="age-btn on" id="age-kids" onclick="pickAge('kids')">
+      <span class="age-ico">🧒</span>Kids
+    </div>
+    <div class="age-btn" id="age-teens" onclick="pickAge('teens')">
+      <span class="age-ico">🧑</span>Teens
+    </div>
+  </div>
+
+  <!-- Deck selector -->
+  <div class="decks">
+    <div class="deck-btn cbt on" id="deck-cbt" onclick="pickDeck('cbt')">
+      <span class="deck-ico">🧠</span>
+      <div class="deck-name">CBT Thoughts</div>
+      <div class="deck-count" id="cnt-cbt">0 cards</div>
+    </div>
+    <div class="deck-btn coping" id="deck-coping" onclick="pickDeck('coping')">
+      <span class="deck-ico">🌿</span>
+      <div class="deck-name">Coping Skills</div>
+      <div class="deck-count" id="cnt-coping">0 cards</div>
+    </div>
+    <div class="deck-btn social" id="deck-social" onclick="pickDeck('social')">
+      <span class="deck-ico">🤝</span>
+      <div class="deck-name">Social Smarts</div>
+      <div class="deck-count" id="cnt-social">0 cards</div>
+    </div>
+  </div>
+
+  <!-- Who's turn -->
+  <div class="who" id="who">⏳ Waiting for client to join...</div>
+
+  <!-- Card stage -->
+  <div class="stage">
+    <div class="card-area">
+      <div class="card-wrap" id="cardWrap" onclick="flipCard()">
+        <div class="card-back" id="cardBack">
+          <div class="card-back-ico">🃏</div>
+          <div class="card-back-txt">Tap to reveal</div>
+        </div>
+        <div class="card-face" id="cardFace">
+          <div class="card-corner" id="cardCorner">CBT</div>
+          <div class="card-category" id="cardCat">Thought Challenge</div>
+          <div class="card-question" id="cardQ">Loading...</div>
+          <div class="card-tip" id="cardTip"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-row">
+      <span id="cardNum">Card 1</span>
+      <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      <span id="cardOf">of 0</span>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="ctrl-btn btn-flip" onclick="flipCard()">🔄 Flip Card</button>
+      <button class="ctrl-btn btn-next" onclick="nextCard(true)">Next Card →</button>
+      <button class="ctrl-btn btn-shuffle" onclick="shuffleDeck(true)">🔀 Shuffle</button>
+    </div>
+  </div>
+
+  <!-- Response area -->
+  <div class="response-area">
+    <div class="response-title">💬 My Response</div>
+    <textarea class="response-input" id="myResp" placeholder="Type your thoughts here..." oninput="onResp()"></textarea>
+    <div class="or-lbl" style="margin-top:10px" id="otherLbl">Their response:</div>
+    <div class="other-response" id="otherResp">Waiting for response...</div>
+  </div>
+
+  <footer>© Michelle S. Coleman LPC PLLC — All Rights Reserved</footer>
+</div>
+
+<script>
+// ══════════════════════════════════════
+//  CARD DATA
+// ══════════════════════════════════════
+const DECKS = {
+  cbt: {
+    kids: [
+      { cat:'Spotting Thoughts', q:'When something goes wrong, what is the very first thing your brain tells you?', tip:'Look for all-or-nothing thinking like "always" or "never."' },
+      { cat:'Thought Check', q:'If your best friend had this same thought, what would you tell them?', tip:'Externalizing helps kids separate from the thought.' },
+      { cat:'Evidence Hunt', q:'What proof do you have that the worried thought is 100% true?', tip:'Gently challenge the evidence together.' },
+      { cat:'Flip It', q:'What is one way the situation could turn out okay — even a tiny bit?', tip:'Builds cognitive flexibility and hope.' },
+      { cat:'Thought Trap', q:'Have you ever thought something bad would happen and it didn\'t? What happened instead?', tip:'Past evidence against catastrophizing.' },
+      { cat:'Body Clues', q:'Where do you feel your worried thoughts in your body? What does that feel like?', tip:'Connects cognitive and somatic experience.' },
+      { cat:'The Bully Brain', q:'If your worried thoughts were a bully, what would you say back to it?', tip:'Externalizing the inner critic.' },
+      { cat:'Best Case', q:'What is the BEST thing that could happen in this situation?', tip:'Balances catastrophic thinking with positive possibility.' },
+      { cat:'Fact vs Feeling', q:'Is this a fact or is this a feeling? How can you tell the difference?', tip:'Core CBT skill — distinguishing thought from reality.' },
+      { cat:'Thought Swap', q:'What is a kinder, more helpful thought you could try instead?', tip:'Cognitive restructuring practice.' },
+      { cat:'Zoom Out', q:'Will this matter in one week? One year? How do you know?', tip:'Helps with perspective and decatastrophizing.' },
+      { cat:'Mind Reading', q:'Have you ever assumed you knew what someone was thinking? Were you right?', tip:'Addresses mind-reading distortion.' },
+    ],
+    teens: [
+      { cat:'Cognitive Distortions', q:'Which thinking trap do you fall into most — catastrophizing, mind-reading, or black-and-white thinking?', tip:'Introduce distortion labels naturally.' },
+      { cat:'Inner Critic', q:'What does your inner critic say most often? Where do you think that voice came from?', tip:'Exploring the origins builds insight.' },
+      { cat:'Evidence Test', q:'If you put your most anxious thought on trial, what would the defense and prosecution each say?', tip:'Formal cognitive restructuring.' },
+      { cat:'Cognitive Flexibility', q:'Rate how true your negative thought feels on a scale of 1–10. Now find one piece of evidence against it. Did the number change?', tip:'Shows thoughts are not fixed.' },
+      { cat:'Labeling', q:'Have you ever judged yourself based on one mistake? What would a fair judge say instead?', tip:'Challenges labeling distortion.' },
+      { cat:'Fortune Telling', q:'When you imagine the future going badly, how often does the worst case actually happen?', tip:'Reality-testing fortune telling.' },
+      { cat:'Thought Record', q:'Describe a recent situation, the thought it triggered, and how it made you feel. Are the thought and feeling the same thing?', tip:'Basic ABC model of CBT.' },
+      { cat:'Compassion Test', q:'Would you speak to a close friend the way you speak to yourself? Why not?', tip:'Self-compassion and inner critic work.' },
+      { cat:'Assumptions', q:'What assumption are you making about this person or situation? What if you\'re wrong?', tip:'Challenging assumptions builds openness.' },
+      { cat:'The Grey Zone', q:'If the extremes are "everything is fine" and "everything is ruined," where does reality actually land?', tip:'Black-and-white to grey thinking.' },
+      { cat:'Trigger Mapping', q:'What kinds of situations most often trigger your negative thoughts? What do they have in common?', tip:'Pattern recognition for insight.' },
+      { cat:'Reframe', q:'What is one way to look at this situation that doesn\'t make you feel worse?', tip:'Not toxic positivity — just balance.' },
+    ]
+  },
+  coping: {
+    kids: [
+      { cat:'Breathing', q:'Can you teach me your favorite way to take a deep breath? Let\'s try it together right now!', tip:'Shared practice deepens engagement.' },
+      { cat:'Movement', q:'What does your body feel like when you\'re really stressed? What helps it feel better?', tip:'Somatic awareness + movement as regulation.' },
+      { cat:'Safe Place', q:'Describe a place — real or made up — where you feel completely calm and safe. What does it look like?', tip:'Guided imagery foundation.' },
+      { cat:'Feelings Thermometer', q:'On a scale of 1–5, how big does your biggest worry feel today? What would bring it down by one point?', tip:'Teaches graduated coping.' },
+      { cat:'Toolbox', q:'If your feelings were in a toolbox, what tools would help you fix "sad"? What about "angry"?', tip:'Builds personalized coping vocabulary.' },
+      { cat:'Grounding', q:'Right now, name 3 things you can see, 2 things you can touch, and 1 thing you can smell.', tip:'5-4-3-2-1 grounding in action.' },
+      { cat:'Helpful Adults', q:'Who are 3 people you could talk to when something feels too big to handle alone?', tip:'Builds support network awareness.' },
+      { cat:'Distraction', q:'What activity makes you forget about worries for a little while? How does that help?', tip:'Validates healthy distraction as a tool.' },
+      { cat:'Self-Talk', q:'What is one thing you could say to yourself when something feels really hard?', tip:'Introduces positive self-talk.' },
+      { cat:'The Calm Down Plan', q:'If you could make a "calm down kit" with 5 things in it, what would you choose?', tip:'Creative personalized regulation planning.' },
+      { cat:'Body Check', q:'When you\'re scared, what does your body do? Does it help or get in the way?', tip:'Psychoeducation about fight-or-flight.' },
+      { cat:'After Hard Things', q:'After something really hard happens, what do you do to help yourself feel better?', tip:'Exploring existing coping repertoire.' },
+    ],
+    teens: [
+      { cat:'Regulation Styles', q:'Are you more of a "vent it out," "quiet down," or "distract yourself" kind of person when stressed?', tip:'Validates individual coping styles.' },
+      { cat:'Window of Tolerance', q:'What does it feel like in your body when you\'re inside your comfort zone vs. outside it?', tip:'Introduce window of tolerance concept.' },
+      { cat:'Avoidance vs Coping', q:'What\'s the difference between avoiding something and actually coping with it? Can you give an example from your life?', tip:'Critical distinction for teens.' },
+      { cat:'The Pause', q:'What helps you slow down before reacting when something makes you really angry or upset?', tip:'Impulse control and pause strategies.' },
+      { cat:'Social Recharge', q:'Do you feel more drained or recharged after spending time with people? What does that tell you about what you need?', tip:'Explores introvert/extrovert coping needs.' },
+      { cat:'Sleep & Mood', q:'How does a bad night of sleep affect your ability to cope the next day?', tip:'Psychoeducation about sleep and regulation.' },
+      { cat:'Creative Release', q:'Have you ever used music, art, writing, or movement to process a hard feeling? What happened?', tip:'Validates creative coping.' },
+      { cat:'The Pressure Valve', q:'What happens inside you when stress builds up and you don\'t release it? How can you tell it\'s getting too full?', tip:'Body awareness and proactive coping.' },
+      { cat:'Healthy vs Unhealthy', q:'What\'s a coping strategy you used to use that wasn\'t that healthy? What do you use now instead?', tip:'Explores coping evolution without shame.' },
+      { cat:'Energy Audit', q:'What drains your energy? What refills it? Are you getting enough of what refills you?', tip:'Practical self-care awareness.' },
+      { cat:'Asking for Help', q:'What makes it hard to ask for help when you\'re struggling? What would make it easier?', tip:'Barriers to help-seeking.' },
+      { cat:'Mindfulness', q:'Have you ever noticed yourself fully in the present moment — not thinking about past or future? What were you doing?', tip:'Natural mindfulness entry point.' },
+    ]
+  },
+  social: {
+    kids: [
+      { cat:'Making Friends', q:'What do you think makes someone a really good friend? Do you think you have those things?', tip:'Self-reflection on friendship qualities.' },
+      { cat:'Conflict', q:'What do you usually do when you and a friend disagree about something?', tip:'Conflict resolution styles exploration.' },
+      { cat:'Feelings in Groups', q:'How do you feel when you walk into a room full of people you don\'t know?', tip:'Social anxiety check-in.' },
+      { cat:'Kindness', q:'Tell me about a time you did something kind for someone. How did it make you feel?', tip:'Reinforces prosocial behavior.' },
+      { cat:'Leaving People Out', q:'Have you ever been left out? Have you ever accidentally left someone out? What was that like?', tip:'Empathy and perspective taking.' },
+      { cat:'Standing Up', q:'If someone was being mean to your friend, what would you do?', tip:'Bystander behavior and values.' },
+      { cat:'Fitting In', q:'Do you ever change the way you act to fit in with different groups? Is that okay?', tip:'Authenticity vs. belonging tension.' },
+      { cat:'Saying Sorry', q:'Is it hard for you to say sorry? What makes a good apology?', tip:'Repair skills and accountability.' },
+      { cat:'Sharing', q:'What is something that is hard for you to share — not just stuff, but maybe feelings too?', tip:'Emotional sharing vulnerability.' },
+      { cat:'Online vs Real', q:'Is it easier to talk to people online or in person? Why do you think that is?', tip:'Social skills across contexts.' },
+      { cat:'Reading People', q:'Can you usually tell how someone is feeling just by looking at them? How?', tip:'Nonverbal cues and empathy.' },
+      { cat:'New People', q:'What do you say when you first meet someone new? What makes it feel scary or easy?', tip:'Initiating social interactions.' },
+    ],
+    teens: [
+      { cat:'Peer Pressure', q:'Describe a time you did something because everyone else was doing it. Would you make the same choice now?', tip:'Values clarification and peer influence.' },
+      { cat:'Trust', q:'What does someone have to do to earn your trust? Has anyone ever broken it? How did you handle that?', tip:'Explores attachment and trust development.' },
+      { cat:'Boundaries', q:'What is a boundary you have with friends that not everyone understands? How do you enforce it?', tip:'Social boundary setting.' },
+      { cat:'Conflict Resolution', q:'When you\'re in an argument with someone you care about, what usually happens? Is that how you want it to go?', tip:'Communication patterns exploration.' },
+      { cat:'Online Life', q:'How is the version of you online different from the version of you in person? Which feels more real?', tip:'Identity and digital self-presentation.' },
+      { cat:'Toxic Friendships', q:'What are signs that a friendship might not be healthy? Have you experienced any of those?', tip:'Recognizing unhealthy dynamics.' },
+      { cat:'Reading the Room', q:'Describe a time you misread a social situation. What happened and what did you learn?', tip:'Social cognition and learning.' },
+      { cat:'Loneliness', q:'Is it possible to feel lonely even when you\'re surrounded by people? When does that happen for you?', tip:'Loneliness vs. solitude distinction.' },
+      { cat:'Family Dynamics', q:'How does your family\'s way of communicating affect how you communicate with friends?', tip:'Family systems influence on social skills.' },
+      { cat:'Being Yourself', q:'Are there people around whom you feel completely yourself? What do they do that allows that?', tip:'Psychological safety in relationships.' },
+      { cat:'Giving Feedback', q:'How do you tell someone something they might not want to hear without hurting the relationship?', tip:'Assertive communication skills.' },
+      { cat:'Romantic Relationships', q:'What do you think is the most important quality in a romantic partner? How does that compare to what you look for in friends?', tip:'Values in relationships — adjust as appropriate.' },
+    ]
+  }
+};
+
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+let peer=null, conn=null, isHost=false, me=1;
+let age='kids', deck='cbt';
+let cardIdx=0, isFlipped=false;
+let shuffledDeck=[];
+const respTimers={};
+
+// ══════════════════════════════════════
+//  NETWORK
+// ══════════════════════════════════════
+function gc(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=a[~~(Math.random()*a.length)];return s;}
+function setDot(c,m){document.getElementById('cDot').className='dot '+c;document.getElementById('cTxt').textContent=m;}
+function tx(m){if(conn&&conn.open)try{conn.send(m);}catch(e){}}
+function gn(p){return document.getElementById('n'+p).value||'Player '+p;}
+function sn(p,v){const el=document.getElementById('n'+p);const f=el.oninput;el.oninput=null;el.value=v;el.oninput=f;}
+
+function initNet(){
+  const code=new URLSearchParams(location.search).get('game');
+  if(!code){
+    isHost=true; me=1;
+    const rc=gc();
+    document.getElementById('shareUrl').textContent=location.href.split('?')[0]+'?game='+rc;
+    document.getElementById('y1').style.display='';
+    peer=new Peer('dd-'+rc,{debug:0});
+    peer.on('open',()=>setDot('orange','Ready! Share the link above with your client.'));
+    peer.on('connection',c=>{
+      conn=c; wire();
+      setDot('green','✅ Client connected!');
+    });
+    peer.on('error',e=>setDot('red','Error: '+e.type));
+  } else {
+    isHost=false; me=2;
+    document.getElementById('shareUrl').textContent=location.href.split('?')[0]+'?game='+code;
+    document.getElementById('y2').style.display='';
+    document.getElementById('n2').value='Client';
+    setDot('orange','Connecting...');
+    peer=new Peer({debug:0});
+    peer.on('open',()=>{conn=peer.connect('dd-'+code,{reliable:true});wire();});
+    peer.on('error',()=>setDot('red','Could not connect. Check the link.'));
+  }
+}
+
+function wire(){
+  conn.on('open',()=>{
+    setDot('green',isHost?'✅ Client connected!':'✅ Connected!');
+    if(isHost){
+      tx({t:'WELCOME',n1:gn(1),n2:gn(2),age,deck,idx:cardIdx,flipped:isFlipped,order:shuffledDeck.map(c=>c._idx)});
+    } else {
+      tx({t:'NAME',p:2,v:gn(2)});
+    }
+    refreshWho();
+  });
+  conn.on('data',onMsg);
+  conn.on('close',()=>setDot('red','Disconnected.'));
+  conn.on('error',()=>setDot('red','Connection error.'));
+}
+
+function onMsg(d){
+  switch(d.t){
+    case 'WELCOME':
+      sn(1,d.n1); sn(2,d.n2);
+      age=d.age; deck=d.deck;
+      updateAgeUI(); updateDeckUI();
+      buildDeck();
+      // Reorder deck to match host
+      if(d.order) reorderDeck(d.order);
+      cardIdx=d.idx; isFlipped=d.flipped;
+      renderCard(); renderFlip(); refreshWho();
+      tx({t:'NAME',p:2,v:gn(2)});
+      break;
+    case 'NAME': sn(d.p,d.v); refreshWho(); break;
+    case 'AGE': age=d.v; updateAgeUI(); buildDeck(); cardIdx=0; isFlipped=false; renderCard(); renderFlip(); break;
+    case 'DECK': deck=d.v; updateDeckUI(); buildDeck(); cardIdx=0; isFlipped=false; renderCard(); renderFlip(); break;
+    case 'FLIP': isFlipped=d.v; renderFlip(); break;
+    case 'NEXT': cardIdx=d.idx; isFlipped=false; renderCard(); renderFlip(); refreshWho(); break;
+    case 'SHUFFLE': reorderDeck(d.order); cardIdx=0; isFlipped=false; renderCard(); renderFlip(); break;
+    case 'RESP': showOtherResp(d.v); break;
+  }
+}
+
+function onName(p){
+  if(p===me) tx({t:'NAME',p,v:gn(p)});
+  refreshWho();
+}
+
+// ══════════════════════════════════════
+//  AGE & DECK
+// ══════════════════════════════════════
+function pickAge(a){
+  age=a; updateAgeUI();
+  buildDeck(); cardIdx=0; isFlipped=false;
+  renderCard(); renderFlip(); refreshWho();
+  tx({t:'AGE',v:a});
+}
+function updateAgeUI(){
+  document.getElementById('age-kids').classList.toggle('on',age==='kids');
+  document.getElementById('age-teens').classList.toggle('on',age==='teens');
+}
+
+function pickDeck(d){
+  deck=d; updateDeckUI();
+  buildDeck(); cardIdx=0; isFlipped=false;
+  renderCard(); renderFlip(); refreshWho();
+  document.getElementById('myResp').value='';
+  document.getElementById('otherResp').textContent='Waiting for response...';
+  tx({t:'DECK',v:d});
+}
+function updateDeckUI(){
+  ['cbt','coping','social'].forEach(d=>{
+    document.getElementById('deck-'+d).classList.toggle('on',d===deck);
+  });
+}
+
+// ══════════════════════════════════════
+//  DECK BUILDING
+// ══════════════════════════════════════
+function buildDeck(){
+  const cards=DECKS[deck][age];
+  shuffledDeck=cards.map((c,i)=>({...c,_idx:i}));
+  updateCounts();
+}
+function reorderDeck(order){
+  const cards=DECKS[deck][age].map((c,i)=>({...c,_idx:i}));
+  shuffledDeck=order.map(i=>cards[i]);
+}
+function updateCounts(){
+  Object.keys(DECKS).forEach(d=>{
+    const n=DECKS[d][age].length;
+    document.getElementById('cnt-'+d).textContent=n+' cards';
+  });
+}
+function shuffleDeck(bc){
+  for(let i=shuffledDeck.length-1;i>0;i--){
+    const j=~~(Math.random()*(i+1));
+    [shuffledDeck[i],shuffledDeck[j]]=[shuffledDeck[j],shuffledDeck[i]];
+  }
+  cardIdx=0; isFlipped=false;
+  renderCard(); renderFlip();
+  document.getElementById('myResp').value='';
+  document.getElementById('otherResp').textContent='Waiting for response...';
+  if(bc) tx({t:'SHUFFLE',order:shuffledDeck.map(c=>c._idx)});
+}
+
+// ══════════════════════════════════════
+//  CARD RENDERING
+// ══════════════════════════════════════
+function renderCard(){
+  if(!shuffledDeck.length) return;
+  const card=shuffledDeck[cardIdx];
+  const face=document.getElementById('cardFace');
+  face.className='card-face '+deck;
+  document.getElementById('cardCorner').textContent=
+    deck==='cbt'?'CBT':deck==='coping'?'Coping':'Social';
+  document.getElementById('cardCat').textContent=card.cat;
+  document.getElementById('cardQ').textContent=card.q;
+  document.getElementById('cardTip').innerHTML='<strong>💡 Therapist tip:</strong> '+card.tip;
+
+  // Only therapist (player 1 / host) sees tip
+  document.getElementById('cardTip').style.display=isHost?'block':'none';
+
+  // Progress
+  const n=cardIdx+1, total=shuffledDeck.length;
+  document.getElementById('cardNum').textContent='Card '+n;
+  document.getElementById('cardOf').textContent='of '+total;
+  document.getElementById('progFill').style.width=((n/total)*100)+'%';
+}
+
+function renderFlip(){
+  document.getElementById('cardWrap').classList.toggle('flipped',isFlipped);
+}
+
+function flipCard(){
+  isFlipped=!isFlipped;
+  renderFlip();
+  tx({t:'FLIP',v:isFlipped});
+}
+
+function nextCard(bc){
+  cardIdx=(cardIdx+1)%shuffledDeck.length;
+  isFlipped=false;
+  renderCard(); renderFlip();
+  document.getElementById('myResp').value='';
+  document.getElementById('otherResp').textContent='Waiting for response...';
+  if(bc) tx({t:'NEXT',idx:cardIdx});
+}
+
+// ══════════════════════════════════════
+//  RESPONSES
+// ══════════════════════════════════════
+function onResp(){
+  const val=document.getElementById('myResp').value;
+  clearTimeout(respTimers.resp);
+  respTimers.resp=setTimeout(()=>tx({t:'RESP',v:val}),150);
+}
+function showOtherResp(v){
+  const name=me===1?gn(2):gn(1);
+  document.getElementById('otherLbl').textContent=name+'\'s response:';
+  document.getElementById('otherResp').textContent=v||'(typing...)';
+}
+
+// ══════════════════════════════════════
+//  WHO BANNER
+// ══════════════════════════════════════
+function refreshWho(){
+  const el=document.getElementById('who');
+  if(!conn||!conn.open){
+    el.textContent='⏳ Waiting for client to join...';
+    document.getElementById('pc1').classList.remove('my-turn');
+    document.getElementById('pc2').classList.remove('my-turn');
+    return;
+  }
+  el.textContent='✅ '+gn(1)+' & '+gn(2)+' — either player can flip cards!';
+  document.getElementById('pc1').classList.remove('my-turn');
+  document.getElementById('pc2').classList.remove('my-turn');
+}
+
+// ══════════════════════════════════════
+//  STARS
+// ══════════════════════════════════════
+function makeStars(){
+  const el=document.getElementById('stars');
+  for(let i=0;i<80;i++){
+    const s=document.createElement('div');
+    const sz=1+Math.random()*2.5;
+    s.className='star';
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s;`;
+    el.appendChild(s);
+  }
+}
+
+function copyLink(){
+  navigator.clipboard.writeText(document.getElementById('shareUrl').textContent).then(()=>{
+    const b=document.getElementById('copyBtn');
+    b.textContent='✅ Copied!'; b.classList.add('copied');
+    setTimeout(()=>{b.textContent='📋 Copy';b.classList.remove('copied');},2000);
+  });
+}
+
+// ── INIT ──
+makeStars();
+buildDeck();
+renderCard();
+initNet();
+</script>
+</body>
+</html>
